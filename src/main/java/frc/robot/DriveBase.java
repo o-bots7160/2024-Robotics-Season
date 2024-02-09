@@ -220,4 +220,12 @@ public class DriveBase
    {
       return swerveDrive.getMaximumVelocity();
    }
+   //
+   //   Returns the latest pose of the robot from odometery
+   //
+   //
+   public Pose2d getPose()
+   {
+      return swerveDrive.getPose();
+   }
 }
