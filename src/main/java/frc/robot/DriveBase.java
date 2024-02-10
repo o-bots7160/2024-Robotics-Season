@@ -36,7 +36,7 @@ public class DriveBase
       {
          swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(),"swerve")).createSwerveDrive(maximumSpeed);
          swerveController = swerveDrive.swerveController;
-         swerveController.thetaController.setTolerance( Math.PI );
+         swerveController.thetaController.setTolerance( Math.PI/180.0 );
       }
       catch (Exception e)
       {
@@ -149,6 +149,11 @@ public class DriveBase
       Pose2d         pose     = swerveDrive.getPose();
       ChassisSpeeds newSpeeds = swerveController.getTargetSpeeds( x, y, radians, pose.getRotation().getRadians(), 3.0 );
 
+      if ( Math.abs(swerveController.thetaController.getPositionError())<.07 )
+      //swerveController.thetaController.atSetpoint() )
+      {
+         newSpeeds = new ChassisSpeeds( x, y, 0.0 ); 
+      }
       swerveDrive.driveFieldOriented( newSpeeds );
       return ! swerveController.thetaController.atSetpoint();
    }
@@ -156,20 +161,20 @@ public class DriveBase
    //   Move and orient to new_pose from current location
    //
    //
-   public boolean move_Pose2d( Pose2d new_pose )
+   public boolean move_Pose2d( Pose2d pose2d )
    {
       Pose2d  pose     = swerveDrive.getPose();
-      double  x1       = new_pose.getX() - pose.getX();
-      double  y1       = new_pose.getY() - pose.getY();
+      double  x1       = pose2d.getX() - pose.getX();
+      double  y1       = pose2d.getY() - pose.getY();
       double  x2       = 0.0;
       double  y2       = 0.0;
-      double  angle    = new_pose.getRotation().getRadians() - pose.getRotation().getRadians();
       double  ctrl;
       double  distance = Math.hypot(x1, y1);
       x_y_ctrl = new Translation2d(  x1, y1 );
 
       if ( ! control_active )
       {
+         swerveController.lastAngleScalar = pose.getRotation( ).getRadians( );
          x_y_PID.reset( );
          x_y_PID.setSetpoint( 0.0 );
       }
@@ -181,7 +186,11 @@ public class DriveBase
          x2 = x1 * ctrl / distance;
          y2 = y1 * ctrl / distance;
       }
-      drive( x2, y2, 0.0 );
+      swerveDrive.driveFieldOriented(
+             swerveController.getTargetSpeeds( x2, y2,
+                                               pose2d.getRotation().getRadians(),
+                                               pose.getRotation().getRadians(),
+                                               3.0 ) );
       return control_active;
    }
    //

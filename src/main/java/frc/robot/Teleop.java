@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class Teleop implements OpModeInterface
@@ -29,10 +31,8 @@ public class Teleop implements OpModeInterface
       hy = Math.pow( hy, 3.0 );
   
       robot.driveBase.drive( x, y, hx, hy );
-      //driveBase.move_Pose2d( new Pose2d( 5.0, 5.0,new Rotation2d( 0.0 ) ) );
+      //robot.driveBase.move_Pose2d( new Pose2d( 5.0, 5.0,new Rotation2d( 0.0 ) ) );
    }
-
-
    public void testPeriodic()
    {
    }
