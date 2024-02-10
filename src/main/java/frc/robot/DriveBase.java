@@ -10,21 +10,21 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 
 public class DriveBase
 {
    private SwerveDrive swerveDrive;
+   private SwerveController swerveController;
    double maximumSpeed = Units.feetToMeters(15.1);
 
    private boolean       control_active = false;
    private double        last_heading   = 0.0;
-   private double        rot_ctrl = 0.0;
    private Translation2d x_y_ctrl = new Translation2d( 0.0, 0.0 );
 
    //                                                 kP   Ki    Kd
-   private PIDController rot_PID = new PIDController( 3.5, 0.0,   0.0 );
    private PIDController x_y_PID = new PIDController( 2.4, 0.145, 0.0 );
    //
    //   Create a YAGSL swerve drive and PID controllers
@@ -35,6 +35,8 @@ public class DriveBase
       try
       {
          swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(),"swerve")).createSwerveDrive(maximumSpeed);
+         swerveController = swerveDrive.swerveController;
+         swerveController.thetaController.setTolerance( Math.PI );
       }
       catch (Exception e)
       {
@@ -43,9 +45,6 @@ public class DriveBase
       //SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
       //swerveDrive.setHeadingCorrection( true );
 
-      rot_PID.setTolerance( Math.toRadians(1.0) );
-      rot_PID.enableContinuousInput(-Math.PI, Math.PI);
-      rot_PID.setIntegratorRange(-0.08, 0.08);
       x_y_PID.setTolerance( 0.03, 0.03);
       x_y_PID.setIntegratorRange(-0.04, 0.04);
    }
@@ -61,7 +60,6 @@ public class DriveBase
       SmartDashboard.putNumber("RobotZ", current_pose.getRotation( ).getDegrees( ) );
       SmartDashboard.putNumber("ctrlx", x_y_ctrl.getX());
       SmartDashboard.putNumber("ctrly", x_y_ctrl.getY());
-      SmartDashboard.putNumber("ctrlz", rot_ctrl);
    }
    //
    //   Add vision measurement collected to odometry
@@ -110,7 +108,7 @@ public class DriveBase
    //
    public void drive( double x, double y, double zx, double zy )
    {
-      driveHeading( x, y, toRadians( zx, zy ) );
+      driveHeading( x, y, swerveController.getJoystickAngle( zx, zy ) );
    }
    //
    //   Drive translating on the field but always orient towards
@@ -148,18 +146,11 @@ public class DriveBase
    //
    public boolean driveHeading( double x, double y, double radians )
    {
-      Pose2d pose = swerveDrive.getPose();
-      if ( !control_active )
-      {
-         rot_PID.reset( );
-         control_active = true;
-      }
-      last_heading = radians;
-      rot_PID.setSetpoint( radians );
-      rot_ctrl = rot_PID.calculate( pose.getRotation().getRadians() );
+      Pose2d         pose     = swerveDrive.getPose();
+      ChassisSpeeds newSpeeds = swerveController.getTargetSpeeds( x, y, radians, pose.getRotation().getRadians(), 3.0 );
 
-      swerveDrive.driveFieldOriented( new ChassisSpeeds( x, y, rot_ctrl ) );
-      return ! rot_PID.atSetpoint();
+      swerveDrive.driveFieldOriented( newSpeeds );
+      return ! swerveController.thetaController.atSetpoint();
    }
    //
    //   Move and orient to new_pose from current location
@@ -181,19 +172,16 @@ public class DriveBase
       {
          x_y_PID.reset( );
          x_y_PID.setSetpoint( 0.0 );
-         rot_PID.reset( );
-         rot_PID.setSetpoint( 0.0 );
       }
       ctrl           =  x_y_PID.calculate( distance );
-      rot_ctrl       = rot_PID.calculate(angle );
-      control_active = !x_y_PID.atSetpoint( ) || !rot_PID.atSetpoint( );
+      control_active = !x_y_PID.atSetpoint( ) || !swerveController.thetaController.atSetpoint( );
 
       if ( ! x_y_PID.atSetpoint( ) )
       {
          x2 = x1 * ctrl / distance;
          y2 = y1 * ctrl / distance;
       }
-      drive( x2, y2, rot_ctrl );
+      drive( x2, y2, 0.0 );
       return control_active;
    }
    //
