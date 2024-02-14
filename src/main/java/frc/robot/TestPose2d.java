@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TestPose2d implements OpModeInterface {
    private RobotContainer robot;
@@ -26,12 +28,15 @@ public class TestPose2d implements OpModeInterface {
    }
    public void Init()
    {   
-      control_pose = new Pose2d();
+      control_pose = robot.driveBase.getPose();
    }
    public void Periodic()
    {
       //System.out.println("Rotation: " + robot.driveBase.() );
       //System.out.println( "Getting button");
+      SmartDashboard.putNumber("TestX", control_pose.getX( ) );
+      SmartDashboard.putNumber("TestY", control_pose.getY( ) );
+      SmartDashboard.putNumber("TestZ", control_pose.getRotation( ).getDegrees( ) );
       if ( Joystick.getRawButtonPressed(1) )
       {
          System.out.println( "Got A button");

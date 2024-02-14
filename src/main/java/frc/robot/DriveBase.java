@@ -16,16 +16,15 @@ import swervelib.parser.SwerveParser;
 
 public class DriveBase
 {
-   private SwerveDrive swerveDrive;
-   private SwerveController swerveController;
-   double maximumSpeed = Units.feetToMeters(15.1);
+   public SwerveDrive swerveDrive;
+   public  SwerveController swerveController;
+   double  maximumSpeed = Units.feetToMeters(15.1);
 
    private boolean       control_active = false;
-   private double        last_heading   = 0.0;
    private Translation2d x_y_ctrl = new Translation2d( 0.0, 0.0 );
 
-   //                                                 kP   Ki    Kd
-   private PIDController x_y_PID = new PIDController( 2.4, 0.145, 0.0 );
+   //                                                 kP      Ki      Kd
+   private PIDController x_y_PID = new PIDController( 2.2, 0.0, 0.0 );
    //
    //   Create a YAGSL swerve drive and PID controllers
    //
@@ -47,6 +46,7 @@ public class DriveBase
 
       x_y_PID.setTolerance( 0.03, 0.03);
       x_y_PID.setIntegratorRange(-0.04, 0.04);
+      swerveDrive.setMotorIdleMode( true);
    }
    //
    //   Must be called periodically to update telemetry
@@ -78,31 +78,6 @@ public class DriveBase
       swerveDrive.driveFieldOriented( new ChassisSpeeds( x, y, rot ) );
    }
    //
-   //   Convert cartesian point to angle
-   //
-   //
-   private double toRadians( double x, double y )
-   {
-      double radians = 0.0;
-      if ( x != 0.0 )
-      {
-         radians = Math.atan2( y, x );
-      }
-      else if ( y > 0.0 )
-      {
-         radians = Math.PI / 2.0;
-      }
-      else if ( y < 0.0 )
-      {
-         radians = Math.PI;
-      }
-      else
-      {
-         radians = last_heading;
-      }
-      return radians;
-   }
-   //
    //   Drive using raw joystick readings with second joystick 
    //
    //
@@ -127,7 +102,7 @@ public class DriveBase
    public boolean driveFacing( double x, double y, Translation2d anchor )
    {
       Pose2d pose = swerveDrive.getPose();
-      double radians = toRadians( pose.getY() - anchor.getY(), pose.getX() - anchor.getX() );
+      double radians = swerveController.getJoystickAngle( pose.getY() - anchor.getY(), pose.getX() - anchor.getX() );
       return driveHeading( x, y, radians );
    }
    //
@@ -164,8 +139,8 @@ public class DriveBase
    public boolean move_Pose2d( Pose2d pose2d )
    {
       Pose2d  pose     = swerveDrive.getPose();
-      double  x1       = pose2d.getX() - pose.getX();
-      double  y1       = pose2d.getY() - pose.getY();
+      double  x1       = pose.getX() - pose2d.getX();
+      double  y1       = pose.getY() - pose2d.getY();
       double  x2       = 0.0;
       double  y2       = 0.0;
       double  ctrl;
@@ -175,6 +150,7 @@ public class DriveBase
       if ( ! control_active )
       {
          swerveController.lastAngleScalar = pose.getRotation( ).getRadians( );
+         swerveController.thetaController.reset();
          x_y_PID.reset( );
          x_y_PID.setSetpoint( 0.0 );
       }
@@ -186,11 +162,12 @@ public class DriveBase
          x2 = x1 * ctrl / distance;
          y2 = y1 * ctrl / distance;
       }
+      
       swerveDrive.driveFieldOriented(
              swerveController.getTargetSpeeds( x2, y2,
                                                pose2d.getRotation().getRadians(),
                                                pose.getRotation().getRadians(),
-                                               3.0 ) );
+                                               0.5 ) );
       return control_active;
    }
    //
@@ -200,14 +177,6 @@ public class DriveBase
    public void resetControl()
    {
       control_active = false;
-   }
-   //
-   //   Moving into Teleop, need to set last heading
-   //
-   //
-   public void setLastHeading()
-   {
-      last_heading = swerveDrive.getPose().getRotation().getRadians();
    }
    //
    //   Return the theoretical maximum velocity of this drive system

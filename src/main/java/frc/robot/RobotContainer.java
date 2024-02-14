@@ -76,7 +76,7 @@ public class RobotContainer
          driveBase.addVisionMeasurement( new_pose, Timer.getFPGATimestamp() - ( latency / 1000.0 ) - ( capture / 1000.0 ) );
          if ( DriverStation.isDisabled() )
          {
-            driveBase.setLastHeading();
+            driveBase.swerveController.lastAngleScalar = driveBase.getPose().getRotation().getRadians();
          }
       }
       driveBase.periodic();
