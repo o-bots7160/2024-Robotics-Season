@@ -10,10 +10,12 @@ public class Teleop implements OpModeInterface
    private RobotContainer robot;
 
    Joystick Joystick = new Joystick(0); // Joystick
+   Joystick Joystick2 = new Joystick(1); // Joystick
    double x, y, hx, hy;
 
-   public Translation2d blueSpeaker = new Translation2d( -8.308975, 1.442593 );
-   public Translation2d redSpeaker  = new Translation2d(  8.308975, 1.442593 );
+   public Translation2d blueSpeaker = new Translation2d( 1.3,  6.0);
+   public Translation2d redSpeaker  = new Translation2d( 17.7592, 6.0);
+   public Translation2d origin      = new Translation2d( 0.0, 0.0 );
 
    public Teleop()
    {
@@ -34,14 +36,15 @@ public class Teleop implements OpModeInterface
       hy = -Joystick.getRawAxis(1);
       hy = Math.pow( hy, 3.0 );
   
-      if ( Joystick.getRawButton( 7 ) )
+      if ( Joystick2.getRawButton(1))
       {
          robot.driveBase.driveFacing( x, y, blueSpeaker );
       }
-      else if ( Joystick.getRawButton(8))
+      else if ( Joystick2.getRawButton( 3 ) )
       {
-         robot.driveBase.driveHeading( x, y, Math.PI/2.0 );
-      } else 
+         robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
+      }
+      else
       {
          robot.driveBase.drive( x, y, hx);//x, hy );
       }

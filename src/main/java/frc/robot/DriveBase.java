@@ -103,6 +103,7 @@ public class DriveBase
    {
       Pose2d pose = swerveDrive.getPose();
       double radians = swerveController.getJoystickAngle( pose.getY() - anchor.getY(), pose.getX() - anchor.getX() );
+      System.out.println("Degrees: " + Math.toDegrees(radians));
       return driveHeading( x, y, radians );
    }
    //
