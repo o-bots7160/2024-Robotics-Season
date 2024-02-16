@@ -44,7 +44,7 @@ public class DriveBase
       //SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
       //swerveDrive.setHeadingCorrection( true );
 
-      x_y_PID.setTolerance( 0.03, 0.03);
+      x_y_PID.setTolerance( 0.05, 0.05);
       x_y_PID.setIntegratorRange(-0.04, 0.04);
       swerveDrive.setMotorIdleMode( true);
    }
@@ -195,4 +195,10 @@ public class DriveBase
    {
       return swerveDrive.getPose();
    }
+
+   public void stopDrive()
+   {
+      swerveDrive.lockPose();
+   }
+
 }
