@@ -24,6 +24,7 @@ public class RobotContainer
    //
    //
    public DriveBase driveBase = new DriveBase();
+   public Shooter shooter = new Shooter();
 
    NetworkTable      table = NetworkTableInstance.getDefault().getTable("limelight");
    NetworkTableEntry tx      = table.getEntry("tx");
@@ -80,6 +81,7 @@ public class RobotContainer
          }
       }
       driveBase.periodic();
+      shooter.periodic();
    }
    public void disable()
    {

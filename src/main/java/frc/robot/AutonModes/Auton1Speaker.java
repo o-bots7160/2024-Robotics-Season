@@ -14,7 +14,7 @@ public class Auton1Speaker implements OpModeInterface
     private RobotContainer robot;
 
     public Pose2d initPose = new Pose2d();
-    public Pose2d nextPose = new Pose2d(3.25, 7.5, new Rotation2d(0.0));
+    public Pose2d nextPose = new Pose2d(3.0, 7.25, new Rotation2d(0.0));
     public Timer autonTimer = new Timer();
     private int step = 0;
     public Translation2d blueSpeaker = new Translation2d( 1.3, 6.0 );
@@ -80,7 +80,7 @@ public class Auton1Speaker implements OpModeInterface
                 {
                     autonTimer.stop();
                     autonTimer.reset();
-                    nextPose = new Pose2d(3.5, 6, new Rotation2d(-Math.PI/2));
+                    nextPose = new Pose2d(3.0, 5.5, new Rotation2d(0.0));
                     step++;
                 }
                 break;
@@ -111,7 +111,7 @@ public class Auton1Speaker implements OpModeInterface
                 {
                     autonTimer.stop();
                     autonTimer.reset();
-                    nextPose = new Pose2d(3.5, 4.5, new Rotation2d(-Math.PI/2));
+                    nextPose = new Pose2d(3.0, 4.15, new Rotation2d(0.0));
                     step++;
                 }
                 break;
@@ -121,12 +121,18 @@ public class Auton1Speaker implements OpModeInterface
                     autonTimer.start();
                     step++;
                 }
-                break;
             case 11:
                 if (autonTimer.get() > 0.1)
                 {
                     autonTimer.stop();
                     autonTimer.reset();
+                    step++;
+                }
+                break;
+            case 12:
+                if (!robot.driveBase.driveFacing(0.0, 0.0, blueSpeaker))
+                {
+                    autonTimer.start();
                     step++;
                 }
                 break;

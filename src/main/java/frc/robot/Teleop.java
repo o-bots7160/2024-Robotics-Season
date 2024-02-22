@@ -36,19 +36,27 @@ public class Teleop implements OpModeInterface
       hy = -Joystick.getRawAxis(1);
       hy = Math.pow( hy, 3.0 );
   
-      if ( Joystick2.getRawButton(1))
+      //if ( Joystick2.getRawButton(1))
+      //{
+      //   robot.driveBase.driveFacing( x, y, blueSpeaker );
+      // }
+      // else if ( Joystick2.getRawButton( 3 ) )
+      // {
+      //    robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
+      // }
+      // else
+      // {
+      //    robot.driveBase.drive( x, y, hx);//x, hy );
+      // }
+      if(Joystick.getRawButton(6))
       {
-         robot.driveBase.driveFacing( x, y, blueSpeaker );
-      }
-      else if ( Joystick2.getRawButton( 3 ) )
+         robot.shooter.angleSetPosition(0.05);
+      } else if ( Joystick.getRawButton(5))
       {
-         robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
+         robot.shooter.angleSetPosition(-0.05);
+      } else {
+         robot.shooter.angleSetPosition(0.0);
       }
-      else
-      {
-         robot.driveBase.drive( x, y, hx);//x, hy );
-      }
-      //robot.driveBase.move_Pose2d( new Pose2d( 5.0, 5.0,new Rotation2d( 0.0 ) ) );
    }
    public void testPeriodic()
    {
