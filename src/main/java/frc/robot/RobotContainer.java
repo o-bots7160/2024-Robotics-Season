@@ -34,6 +34,7 @@ public class RobotContainer
    NetworkTableEntry tl      = table.getEntry("tl");
    NetworkTableEntry cl      = table.getEntry("cl");
    NetworkTableEntry botpose = table.getEntry("botpose");
+   //Pose2dFilter      filter  = new Pose2dFilter();
 
    private RobotContainer()
    {
@@ -72,8 +73,17 @@ public class RobotContainer
       LimelightResults llresults = LimelightHelpers.getLatestResults("");
       if ( id > 0 && llresults.targetingResults.valid )
       {
-         Pose2d ll_pose = llresults.targetingResults.getBotPose2d();
+         Pose2d ll_pose  = llresults.targetingResults.getBotPose2d();
          Pose2d new_pose = new Pose2d( ll_pose.getX() + 8.7532, ll_pose.getY() +4.106, ll_pose.getRotation() );
+         // Use these lines to filter pose data from limelight
+         //if ( filter.addData( new_pose, Timer.getFPGATimestamp() - ( latency / 1000.0 ) - ( capture / 1000.0 ) ) )
+         //{
+         //   driveBase.addVisionMeasurement( filter.resultPose, filter.resultTime );
+         //   if ( DriverStation.isDisabled() )
+         //   {
+         //      driveBase.swerveController.lastAngleScalar = driveBase.getPose().getRotation().getRadians();
+         //   }
+         //}
          driveBase.addVisionMeasurement( new_pose, Timer.getFPGATimestamp() - ( latency / 1000.0 ) - ( capture / 1000.0 ) );
          if ( DriverStation.isDisabled() )
          {
