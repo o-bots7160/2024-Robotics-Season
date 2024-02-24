@@ -91,7 +91,7 @@ public class RobotContainer
          }
       }
       driveBase.periodic();
-      shooter.periodic();
+      //shooter.periodic( 0.0 );
    }
    public void disable()
    {

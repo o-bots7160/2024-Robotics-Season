@@ -1,9 +1,13 @@
 package frc.robot;
 
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.CANVenom.BrakeCoastMode;
+import com.playingwithfusion.CANVenom.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -30,15 +34,17 @@ public class Shooter
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
 
-   //private CANSparkMax _intake;
+   private TalonFX _intake;
    //private SparkPIDController pid_intake;
    //private RelativeEncoder en_intake;
    //private double intake_target = 0.0; // speed
 
-   //private TalonFX _topShoot;
+   private TalonFX _topShoot;
    //private SparkPIDController pid_topShoot;
    //private RelativeEncoder en_topShoot;
    //private double topShooter_target = 0.0;
+
+   private TalonFX _bottomShoot;
 
    private MANIP_STATE state = MANIP_STATE.STOW;
 
@@ -62,7 +68,8 @@ public class Shooter
       en_angle = new DutyCycleEncoder( 0);//_angle.getAlternateEncoder(8192);
       // Do we need this? _angle.burnFlash();
 
-      // _intake = new CANSparkMax(53, MotorType.kBrushless);
+      _intake = new TalonFX(53);
+      //_intake.setControl( );
       // _intake.setSmartCurrentLimit(35);
       // _intake.setInverted(true);
       // _intake.enableSoftLimit(SoftLimitDirection.kReverse, true);
@@ -80,7 +87,7 @@ public class Shooter
       // en_intake = _intake.getEncoder();
       // Do we need this? _intake.burnFlash();
 
-      // _topShoot = new TalonFX(54);
+      _topShoot = new TalonFX(54);
       // _topShoot.setVoltage(35);
       // _topShoot.setInverted(true);
       // _topShoot.setReverseLimit(SoftLimitDirection.kReverse, true);
@@ -97,6 +104,9 @@ public class Shooter
       // pid_topShoot.setOutputRange( -0.9, 0.9 );
       // en_topShoot = _topShoot.getEncoder();
       // Do we need this? _topShoot.burnFlash();
+
+      _bottomShoot = new TalonFX(55);
+      _bottomShoot.setControl(new Follower(54, true));
 
       disable( );
    } 
@@ -250,17 +260,18 @@ public class Shooter
       // }
    }
 
-   private void intakeSetVelocity( double new_target)
+   public void intakeSetVelocity( double new_target)
    {
-      if (new_target < 0.0 )
-      {
-         new_target = 0.0;
-      }
-      else if ( new_target > 230.0 )
-      {
-         new_target = 230.0;
-      }
-      angle_target = new_target;
+      // if (new_target < 0.0 )
+      // {
+      //    new_target = 0.0;
+      // }
+      // else if ( new_target > 230.0 )
+      // {
+      //    new_target = 230.0;
+      // }
+      //angle_target = new_target;
+      _intake.setControl( new DutyCycleOut( new_target ) );
       // pid_intake.setReference(new_target, ControlType.kVelocity);
    }
 
@@ -277,18 +288,19 @@ public class Shooter
       // }
    }
 
-   private void topShooterSetVelocity( double new_target)
+   public void shooterSetVelocity( double new_target)
    {
-      if (new_target < 0.0 )
-      {
-         new_target = 0.0;
-      }
-      else if ( new_target > 230.0 )
-      {
-         new_target = 230.0;
-      }
+      // if (new_target < 0.0 )
+      // {
+      //    new_target = 0.0;
+      // }
+      // else if ( new_target > 230.0 )
+      // {
+      //    new_target = 230.0;
+      // }
       // topShooter_target = new_target;
       // pid_topShoot.setReference(new_target, ControlType.kVelocity);
+      _topShoot.setControl( new DutyCycleOut( new_target ) );
    }
 
    private void calculateAngleAndSpeedFrom( double distance )

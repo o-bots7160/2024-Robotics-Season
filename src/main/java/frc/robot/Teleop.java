@@ -1,7 +1,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -50,12 +52,31 @@ public class Teleop implements OpModeInterface
       // }
       if(Joystick.getRawButton(6))
       {
-         robot.shooter.angleSetPosition(0.05);
+         robot.shooter.angleSetPosition(-0.05);
       } else if ( Joystick.getRawButton(5))
       {
-         robot.shooter.angleSetPosition(-0.05);
+         robot.shooter.angleSetPosition( 0.05);//( Math.PI / 2.0 );
       } else {
          robot.shooter.angleSetPosition(0.0);
+      }
+      if (Joystick.getRawButton(2))
+      {
+         robot.shooter.intakeSetVelocity( 0.80 );
+      }
+      else{
+         robot.shooter.intakeSetVelocity( 0.0 );
+      }
+      if (Joystick.getRawButton(3))
+      {
+         robot.shooter.shooterSetVelocity( 0.50 );
+      }
+      else if (Joystick.getRawButton(1))
+      {
+         robot.shooter.shooterSetVelocity(0.75);
+      }
+      else
+      {
+         robot.shooter.shooterSetVelocity( 0.0 );
       }
    }
    public void testPeriodic()

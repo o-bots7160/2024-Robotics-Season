@@ -47,7 +47,7 @@ public class DriveBase
 
       x_y_PID.setTolerance( 0.05, 0.05);
       x_y_PID.setIntegratorRange(-0.04, 0.04);
-      swerveDrive.setMotorIdleMode( true);
+      swerveDrive.setMotorIdleMode( true );
    }
    //
    //   Must be called periodically to update telemetry
