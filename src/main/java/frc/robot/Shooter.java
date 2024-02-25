@@ -129,12 +129,12 @@ public class Shooter
       switch( state )
       {
          case DISABLE:
-            angleSetPosition( 0.0 );
+            //angleSetPosition( 0.0 );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case STOW:
-            angleSetPosition( 0.0 );
+            //angleSetPosition( 0.0 );
             intakeSetVelocity( 0.0 );            // topShooter_target = 0.0;
             shooterSetVelocity( 0.0 );
             break;
@@ -151,12 +151,12 @@ public class Shooter
             }
             break;
          case AMPLIFIER_TARGET:
-            angleSetPosition( 0.0 );
+            //angleSetPosition( 0.0 );
             // intake_target  =  0.0;
             // topShooter_target =  0.0;  // Set speed for amplifier
             break;
          case AMPLIFIER_SHOOT:
-            angleSetPosition( 0.0 );
+            //angleSetPosition( 0.0 );
             // intake_target  = 10.0;  // Set for passing to topShooter
             // topShooter_target = 10.0;  // Set speed for amplifier
             break;
@@ -165,12 +165,10 @@ public class Shooter
             {
                intakeSetVelocity( 0.0 );            // topShooter_target = 0.0;
                calculateAngleAndSpeedFrom( distance );
-               // topShooter_target = 10.0;  // Set speed for amplifier
             }
             else
             {
                setState(MANIP_STATE.STOW, distance);
-               System.out.println( "Target leaving state:" + state );
             }
             break;
          case SPEAKER_SHOOT:
@@ -178,12 +176,10 @@ public class Shooter
             {
                calculateAngleAndSpeedFrom( distance );
                intakeSetVelocity( 80.0 );
-               // topShooter_target = 10.0;  // Set speed for amplifier
             }
             else
             {
                setState(MANIP_STATE.STOW, distance);
-               System.out.println( "Shoot leaving state:" + state );
             }
             break;
       }
@@ -200,7 +196,7 @@ public class Shooter
             disable( );  // All off
             break;
          case STOW:
-            angleSetPosition( 0.0 );
+            //angleSetPosition( 0.0 );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
@@ -212,7 +208,7 @@ public class Shooter
             break;
          case AMPLIFIER_TARGET:
          case AMPLIFIER_SHOOT:
-            angleSetPosition  ( angle_target   );
+            //angleSetPosition  ( angle_target   );
             // intakeSetVelocity ( intake_target  );
             //topShooterSetVelocity( topShooter_target );
             break;
@@ -280,7 +276,7 @@ public class Shooter
       // }
       // angle_target = new_target;
       //pid_angle.setReference(new_target, ControlType.kPosition);
-      //_angle.set( new_target );
+      _angle.set( new_target );
    }
 
    private boolean intakeAtVelocity()
