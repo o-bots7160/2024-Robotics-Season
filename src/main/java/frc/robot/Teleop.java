@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
+import frc.robot.Manipulator.MANIP_STATE;
 
 public class Teleop implements OpModeInterface
 {
@@ -59,25 +60,34 @@ public class Teleop implements OpModeInterface
       } else {
          robot.shooter.angleSetPosition(0.0);
       }
-      if (Joystick.getRawButton(2))
+      if (Joystick.getRawButtonPressed(2))
       {
-         robot.shooter.intakeSetVelocity( 0.80 );
+         robot.shooter.setState( MANIP_STATE.INTAKE, 0.0 );
       }
-      else{
-         robot.shooter.intakeSetVelocity( 0.0 );
-      }
-      if (Joystick.getRawButton(3))
+      if (Joystick.getRawButtonPressed(1))
       {
-         robot.shooter.shooterSetVelocity( 0.50 );
+         robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, 0.0 );
       }
-      else if (Joystick.getRawButton(1))
+      if (Joystick.getRawButtonPressed(3))
       {
-         robot.shooter.shooterSetVelocity(0.75);
+         robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, 0.0 );
       }
-      else
-      {
-         robot.shooter.shooterSetVelocity( 0.0 );
-      }
+      // else
+      // {
+      //    robot.shooter.setState( MANIP_STATE.STOW, 0.0 );
+      // }
+      // if (Joystick.getRawButton(3))
+      // {
+      //    robot.shooter.shooterSetVelocity( 0.50 );
+      // }
+      // else if (Joystick.getRawButton(1))
+      // {
+      //    robot.shooter.shooterSetVelocity(0.75);
+      // }
+      // else
+      // {
+      //    robot.shooter.shooterSetVelocity( 0.0 );
+      // }
    }
    public void testPeriodic()
    {
