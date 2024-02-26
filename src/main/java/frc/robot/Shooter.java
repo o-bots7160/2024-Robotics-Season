@@ -1,8 +1,10 @@
 package frc.robot;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.playingwithfusion.TimeOfFlight;
@@ -13,6 +15,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -31,7 +34,7 @@ public class Shooter
    private TimeOfFlight sensor = new TimeOfFlight( 101 );
 
    private CANSparkMax _angle;
-   private SparkPIDController pid_angle;
+   private PIDController pid_angle = new PIDController(0.4, 0.0, 0.0);
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
 
@@ -41,7 +44,8 @@ public class Shooter
    //private double intake_target = 0.0; // speed
 
    private TalonFX _topShoot;
-   //private SparkPIDController pid_topShoot;
+   private Slot0Configs pid_shoot = new Slot0Configs();
+   //private PIDController pid_topShoot;
    //private RelativeEncoder en_topShoot;
    private double topShooter_target = 0.0;
 
@@ -61,13 +65,10 @@ public class Shooter
       _angle.enableSoftLimit(SoftLimitDirection.kForward, true);
       _angle.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
       _angle.setIdleMode(IdleMode.kBrake);
-      pid_angle = _angle.getPIDController();
-      pid_angle.setP          ( 0.5 );
-      pid_angle.setI          ( 0.0 );
-      pid_angle.setD          ( 0.0 );
-      pid_angle.setIZone      ( 0.0 );
-      pid_angle.setFF         ( 0.0 );
-      pid_angle.setOutputRange( -0.9, 0.9 );
+      pid_angle.enableContinuousInput(0.0, 2.0 * Math.PI);
+      //pid_angle.setIZone      ( 0.0 );
+      //pid_angle.setFF         ( 0.0 );
+      //pid_angle.setOutputRange( -0.9, 0.9 );
       en_angle = new DutyCycleEncoder( 0);//_angle.getAlternateEncoder(8192);
       // Do we need this? _angle.burnFlash();
 
@@ -91,6 +92,10 @@ public class Shooter
       // Do we need this? _intake.burnFlash();
 
       _topShoot = new TalonFX(54);
+      pid_shoot.kP = 0.5;
+      pid_shoot.kI = 0.0;
+      pid_shoot.kD = 0.0;
+      _topShoot.getConfigurator().apply(pid_shoot);
       // _topShoot.setVoltage(35);
       // _topShoot.setInverted(true);
       // _topShoot.setReverseLimit(SoftLimitDirection.kReverse, true);
@@ -129,19 +134,19 @@ public class Shooter
       switch( state )
       {
          case DISABLE:
-            //angleSetPosition( 0.0 );
+            angleSetPosition( 0.0 );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case STOW:
-            //angleSetPosition( 0.0 );
-            intakeSetVelocity( 0.0 );            // topShooter_target = 0.0;
+            angleSetPosition( 0.0 );
+            intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case INTAKE:
             if ( ! haveNote() )
             {
-               //angleSetPosition( Math.PI / 2.0 );
+               angleSetPosition( Math.toRadians(60.0) );
                intakeSetVelocity( 80.0 );
                shooterSetVelocity( 0.0 );
             }
@@ -163,8 +168,10 @@ public class Shooter
          case SPEAKER_TARGET:
             if ( haveNote( ) )
             {
-               intakeSetVelocity( 0.0 );            // topShooter_target = 0.0;
+               intakeSetVelocity( 0.0 );
                calculateAngleAndSpeedFrom( distance );
+               angleSetPosition( angle_target );
+               shooterSetVelocity(topShooter_target);
             }
             else
             {
@@ -176,6 +183,8 @@ public class Shooter
             {
                calculateAngleAndSpeedFrom( distance );
                intakeSetVelocity( 80.0 );
+               angleSetPosition( angle_target );
+               shooterSetVelocity(topShooter_target);
             }
             else
             {
@@ -188,7 +197,8 @@ public class Shooter
 
    public void periodic( double distance )
    {
-      SmartDashboard.putNumber("angle position", en_angle.getAbsolutePosition());
+      double angleRadians = en_angle.getAbsolutePosition() * 2.0 * Math.PI;
+      SmartDashboard.putNumber("angle position", Math.toDegrees( angleRadians ));
       SmartDashboard.putNumber("TOF", sensor.getRange() );
       switch( state )
       {
@@ -196,7 +206,6 @@ public class Shooter
             disable( );  // All off
             break;
          case STOW:
-            //angleSetPosition( 0.0 );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
@@ -208,7 +217,6 @@ public class Shooter
             break;
          case AMPLIFIER_TARGET:
          case AMPLIFIER_SHOOT:
-            //angleSetPosition  ( angle_target   );
             // intakeSetVelocity ( intake_target  );
             //topShooterSetVelocity( topShooter_target );
             break;
@@ -224,6 +232,8 @@ public class Shooter
             }
             break;
       }
+      _angle.set( pid_angle.calculate( angleRadians ) );
+      //shooterSetVelocity(topShooter_target);
    }
 
    public boolean atPosition( )
@@ -274,9 +284,9 @@ public class Shooter
       // {
       //    new_target = 230.0;
       // }
-      // angle_target = new_target;
-      //pid_angle.setReference(new_target, ControlType.kPosition);
-      _angle.set( new_target );
+      angle_target = new_target;
+      pid_angle.setSetpoint(new_target);
+      //_angle.set( new_target );
    }
 
    private boolean intakeAtVelocity()
@@ -330,14 +340,14 @@ public class Shooter
       // {
       //    new_target = 230.0;
       // }
-      // topShooter_target = new_target;
+       topShooter_target = new_target;
       // pid_topShoot.setReference(new_target, ControlType.kVelocity);
-      _topShoot.setControl( new DutyCycleOut( new_target ) );
+      _topShoot.setControl( new DutyCycleOut( new_target ) );//new VelocityDutyCycle( new_target ) );
    }
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      angle_target   = 30.0;
-      shooterSetVelocity( 0.40 );
+      angle_target   = Math.toRadians(30.0);
+      topShooter_target = 0.40;
    }
 }

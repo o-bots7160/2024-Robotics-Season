@@ -23,6 +23,9 @@ public class RobotContainer
    //  The devices this robot uses
    //
    //
+   public Translation2d blueSpeaker = new Translation2d( 1.3,  6.0);
+   public Translation2d redSpeaker  = new Translation2d( 17.7592, 6.0);
+   public Translation2d origin      = new Translation2d( 0.0, 0.0 );
    public DriveBase driveBase = new DriveBase();
    public Shooter shooter = new Shooter();
 
@@ -91,7 +94,8 @@ public class RobotContainer
          }
       }
       driveBase.periodic();
-      shooter.periodic( 0.0 );
+      Pose2d current_pose = driveBase.getPose();
+      shooter.periodic( Math.hypot(current_pose.getX() - blueSpeaker.getX(),current_pose.getY() - blueSpeaker.getY()) );
    }
    public void disable()
    {

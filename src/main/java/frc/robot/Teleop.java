@@ -51,14 +51,9 @@ public class Teleop implements OpModeInterface
       // {
       //    robot.driveBase.drive( x, y, hx);//x, hy );
       // }
-      if(Joystick.getRawButton(6))
+      if (Joystick.getRawButtonPressed(4))
       {
-         robot.shooter.angleSetPosition(-0.05);
-      } else if ( Joystick.getRawButton(5))
-      {
-         robot.shooter.angleSetPosition( 0.05);//( Math.PI / 2.0 );
-      } else {
-         robot.shooter.angleSetPosition(0.0);
+         robot.shooter.setState(MANIP_STATE.STOW, 0.0);
       }
       if (Joystick.getRawButtonPressed(2))
       {
