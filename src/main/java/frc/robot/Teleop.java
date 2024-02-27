@@ -13,7 +13,8 @@ public class Teleop implements OpModeInterface
    private RobotContainer robot;
 
    Joystick Joystick = new Joystick(0); // Joystick
-   Joystick Joystick2 = new Joystick(1); // Joystick
+   Joystick Buttons1 = new Joystick(1); // Button Board
+   Joystick Buttons2 = new Joystick(2); // Button Board
    double x, y, hx, hy;
 
    public Translation2d blueSpeaker = new Translation2d( 1.3,  6.0);
@@ -51,21 +52,60 @@ public class Teleop implements OpModeInterface
       // {
       //    robot.driveBase.drive( x, y, hx);//x, hy );
       // }
-      if (Joystick.getRawButtonPressed(4))
+      if (Buttons1.getRawButtonPressed(2)) // Travel
       {
          robot.shooter.setState(MANIP_STATE.STOW, 0.0);
       }
-      if (Joystick.getRawButtonPressed(2))
+      if (Joystick.getRawAxis(3) > 0.25) // Intake
       {
          robot.shooter.setState( MANIP_STATE.INTAKE, 0.0 );
       }
-      if (Joystick.getRawButtonPressed(1))
+      else if (Buttons1.getRawButtonPressed(3)) // Shoot
       {
          robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, 0.0 );
       }
-      if (Joystick.getRawButtonPressed(3))
+      else if (Joystick.getRawButton(1))
+         {
+            robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, 0.0 );
+         }
+      else if (!Buttons1.getRawButton(4)) // Limelight On
       {
-         robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, 0.0 );
+         if (Buttons1.getRawButton(5)) // Rotate Up
+         {
+            robot.shooter.manualAngle(0.1);
+         }
+         else if (Buttons1.getRawButton(6)) // Rotate Down
+         {
+            robot.shooter.manualAngle(-0.1);
+         }
+         else
+         {
+            robot.shooter.manualAngle(0.0);
+         }
+      }
+      else if (Buttons2.getRawButtonPressed(4)) // Amp
+      {
+         robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
+      }
+      if (Buttons1.getRawButtonPressed(1)) // Lock
+      {
+         robot.driveBase.stopDrive();
+      }
+      if (Buttons1.getRawButton(11)) // Left Climb Up
+      {
+
+      }
+      else if (Buttons1.getRawButton(7)) // Left Climb Down
+      {
+
+      }
+      if (Buttons2.getRawButton(6)) // Right Climb Up
+      {
+
+      }
+      else if (Buttons2.getRawButton(5)) // Right Climb Down
+      {
+
       }
       // else
       // {

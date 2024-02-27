@@ -3,9 +3,8 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.DoubleCircularBuffer;
-import edu.wpi.first.wpilibj.Timer;
 
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Pose2dFilter
 {
@@ -25,7 +24,7 @@ public class Pose2dFilter
       {
          if ( size() >= maxSize )
          {
-            sum -= super.getFirst();
+            sum -= super.getLast();
          }
          sum += value;
          super.addFirst( value );
@@ -35,10 +34,10 @@ public class Pose2dFilter
       {
          if ( size() >= maxSize )
          {
-            sum -= super.getLast();
+            sum -= super.getFirst();
          }
          sum += value;
-         super.addFirst( value );
+         super.addLast( value );
       }
       @Override
       public void clear()
@@ -50,22 +49,20 @@ public class Pose2dFilter
       public double removeFirst( )
       {
          double temp = 0.0;
-         if ( size() >= maxSize )
-         {
-            temp = super.removeFirst( );
-            sum -= temp;;
-         }
+
+         temp = super.removeFirst( );
+         sum -= temp;
+
          return temp;
       }
       @Override
       public double removeLast( )
       {
          double temp = 0.0;
-         if ( size() >= maxSize )
-         {
-            temp = super.removeFirst();
-            sum -= temp;
-         }
+
+         temp = super.removeLast();
+         sum -= temp;
+
          return temp;
       }
       @Override
@@ -79,23 +76,35 @@ public class Pose2dFilter
          addLast( value );
          return sum / size();
       }
+      public double average( )
+      {
+         return sum / size();
+      }
    }
 
-   private AverageBuffer buffX  = new AverageBuffer( maxSamples );
-   private AverageBuffer buffY  = new AverageBuffer( maxSamples );
-   private AverageBuffer buffR  = new AverageBuffer( maxSamples );
-   private AverageBuffer buffT  = new AverageBuffer( maxSamples );
+   private AverageBuffer buffX  = new AverageBuffer( maxSamples     );
+   private AverageBuffer buffY  = new AverageBuffer( maxSamples     );
+   private AverageBuffer buffR  = new AverageBuffer( maxSamples     );
+   private AverageBuffer buffT  = new AverageBuffer( maxSamples     );
    private AverageBuffer buffTd = new AverageBuffer( maxSamples - 1 );
 
-   public  Pose2d resultPose;
-   public  double resultTime;
-   private double avgPeriod; 
+   public  Pose2d  avgPose;
+   public  double  avgTime;
+   public  double  avgPeriod; 
+   private boolean verbosity;
    //
-   //   Constructor prepare to receive poses collected from vision system
+   //   Constructor prepare to filter poses collected from vision (or other)
+   //   system
    //
    //
-   public Pose2dFilter()
+   public Pose2dFilter( )
    {
+      verbosity = false; 
+      reset();
+   }
+   public Pose2dFilter( boolean new_verbosity)
+   {
+      verbosity = new_verbosity;  
       reset();
    }
    //
@@ -109,22 +118,29 @@ public class Pose2dFilter
       buffR.clear();
       buffT.clear();
       buffTd.clear();
-      resultPose = new Pose2d();
-      resultTime = 0;
-      avgPeriod  = 0;
+      avgPose    = new Pose2d();
+      avgTime    = 0.0;
+      avgPeriod  = 0.0;
    }
    //
-   //   Add a pose to the averaging history and return true is we have enough
-   //   samples for a good average and false otherwise
+   //   Add a pose to the averaging history and return true if we have enough
+   //   samples for a good average (and they aren't too spread out) and false
+   //   otherwise
+   //
+   //   Results are populated into:
+   //      avgPose: average X, Y, and heading of samples
+   //      avgTime: average of timestamp to pass to pose estimator
    //
    //   Also calculated for the callers information is:
-   //      diffTime:  average time between readings
+   //      avgPeriod:  average time between readings
    //
    public boolean addData( Pose2d newSample, double timestamp )
    {
-      double currentTime = Timer.getFPGATimestamp();
-      // Clean out old data
-      while ( buffT.size() > 0 && ( currentTime - buffT.getFirst() ) > 3000.0 )
+      //
+      // Clean out data older that 3 seconds??? Is this too long? Too short?
+      //
+      //
+      while ( buffT.size() > 0 && ( timestamp - buffT.getFirst() ) > 3.0 )
       {
          buffX.removeFirst();
          buffY.removeFirst();
@@ -132,13 +148,20 @@ public class Pose2dFilter
          buffT.removeFirst();
          buffTd.removeFirst();
       }
-      resultPose  = new Pose2d( buffX.average( newSample.getX() ),
-                                buffY.average( newSample.getY() ),
-                                new Rotation2d( buffR.average( newSample.getRotation().getRadians() ) ) );
-      avgPeriod   = buffTd.average( timestamp - buffT.getLast() );
-      resultTime  = buffT.average(  timestamp );
+      avgPose   = new Pose2d( buffX.average( newSample.getX() ),
+                              buffY.average( newSample.getY() ),
+                              new Rotation2d( buffR.average( newSample.getRotation().getRadians() ) ) );
+      avgPeriod = buffTd.average( timestamp - buffT.getLast() );
+      avgTime   = buffT.average(  timestamp );
 
-
-      return ( buffX.size() < (long)( maxSamples / 2.0 ) && ( avgPeriod > 1000.0 ) );
+      if ( verbosity )
+      {
+         SmartDashboard.putNumber( "Pose2dFilter/Samples", buffX.size( )   );
+         SmartDashboard.putNumber( "Pose2dFilter/Period",  avgPeriod       );
+         SmartDashboard.putNumber( "Pose2dFilter/X",       avgPose.getX( ) );
+         SmartDashboard.putNumber( "Pose2dFilter/Y",       avgPose.getY( ) );
+         SmartDashboard.putNumber( "Pose2dFilter/Heading", avgPose.getRotation( ).getDegrees( ) );
+      }
+      return ( buffX.size() > (long)( maxSamples / 4.0 ) && ( avgPeriod < 0.5 ) );
    }
 }

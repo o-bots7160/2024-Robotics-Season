@@ -17,6 +17,7 @@ import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.CANSparkBase.ControlType;
@@ -34,7 +35,7 @@ public class Shooter
    private TimeOfFlight sensor = new TimeOfFlight( 101 );
 
    private CANSparkMax _angle;
-   private PIDController pid_angle = new PIDController(0.4, 0.0, 0.0);
+   private PIDController pid_angle = new PIDController(0.7, 0.0, 0.0);
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
 
@@ -50,6 +51,9 @@ public class Shooter
    private double topShooter_target = 0.0;
 
    private TalonFX _bottomShoot;
+
+   Timer intakeTimer = new Timer();
+   Timer shootTimer = new Timer();
 
    private MANIP_STATE state = MANIP_STATE.STOW;
 
@@ -117,6 +121,7 @@ public class Shooter
       _bottomShoot.setControl(new Follower(54, true));
 
       disable( );
+
    } 
 
    public void disable( ) 
@@ -146,8 +151,8 @@ public class Shooter
          case INTAKE:
             if ( ! haveNote() )
             {
-               angleSetPosition( Math.toRadians(60.0) );
-               intakeSetVelocity( 80.0 );
+               angleSetPosition( Math.toRadians(30.0) );
+               intakeSetVelocity( 40.0 );
                shooterSetVelocity( 0.0 );
             }
             else
@@ -233,7 +238,7 @@ public class Shooter
             break;
       }
       _angle.set( pid_angle.calculate( angleRadians ) );
-      //shooterSetVelocity(topShooter_target);
+      shooterSetVelocity(topShooter_target);
    }
 
    public boolean atPosition( )
@@ -289,17 +294,22 @@ public class Shooter
       //_angle.set( new_target );
    }
 
+   public void manualAngle( double speed )
+   {
+      _angle.set(speed);
+   }
+
    private boolean intakeAtVelocity()
    {
       // double error = intake_target - en_intake.getPosition();
-      // if ( ( error < 3.0 ) && ( error > -3.0 ) ) // What should these be?
-      // {
-      //    return true;
-      // }
-      // else
-      // {
+      if ( intakeTimer.get() > 0.5 ) // What should these be?
+      {
+         return true;
+      }
+      else
+      {
          return false;
-      // }
+      }
    }
 
    public void intakeSetVelocity( double new_target)
@@ -314,6 +324,8 @@ public class Shooter
       // }
       //angle_target = new_target;
       _intake.setControl( new DutyCycleOut( new_target ) );
+      intakeTimer.reset();
+      intakeTimer.start();
       // pid_intake.setReference(new_target, ControlType.kVelocity);
    }
 
@@ -347,7 +359,7 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      angle_target   = Math.toRadians(30.0);
+      angle_target   = Math.toRadians(0.0);
       topShooter_target = 0.40;
    }
 }
