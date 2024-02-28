@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -7,7 +9,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class Manipulator
 {
-   private Shooter  _shooter    = new Shooter( );
+   private Shooter  _shooter;
    private Solenoid _extension0 = new Solenoid( PneumaticsModuleType.REVPH, 0 );
    private Solenoid _extension1 = new Solenoid( PneumaticsModuleType.REVPH, 1 );
    private Solenoid _elbow0     = new Solenoid( PneumaticsModuleType.REVPH, 2 );
@@ -26,8 +28,9 @@ public class Manipulator
 
    private MANIP_STATE manip_state = MANIP_STATE.STOW;
 
-   public Manipulator( )
+   public Manipulator( BooleanSupplier new_manual )
    {
+      _shooter = new Shooter( new_manual );
       disable( );
    }
 

@@ -24,12 +24,12 @@ public class RobotContainer
    //  The devices this robot uses
    //
    //
-   private Joystick Buttons1 = new Joystick(1); // Button Board
+   private boolean manual = false;//private Joystick Buttons1 = new Joystick(1); // Button Board
    public Translation2d blueSpeaker = new Translation2d( 1.3,  6.0);
    public Translation2d redSpeaker  = new Translation2d( 17.7592, 6.0);
    public Translation2d origin      = new Translation2d( 0.0, 0.0 );
    public DriveBase driveBase = new DriveBase();
-   public Shooter shooter = new Shooter();
+   public Shooter shooter = new Shooter( ()->{ return manual; } );
 
    NetworkTable      table = NetworkTableInstance.getDefault().getTable("limelight");
    NetworkTableEntry tx      = table.getEntry("tx");
@@ -69,9 +69,8 @@ public class RobotContainer
       double latency = tl.getDouble(0.0); 
       double capture = cl.getDouble(0.0); 
 
-      if ( Buttons1.getRawButton(4))
+      if ( !manual )
       {
-
          //post to smart dashboard periodically
          SmartDashboard.putNumber("LimelightX", x);
          SmartDashboard.putNumber("LimelightY", y);
@@ -105,5 +104,9 @@ public class RobotContainer
    }
    public void disable()
    {
+   }
+   public void setManual( boolean new_manual )
+   {
+      manual = new_manual;
    }
 }

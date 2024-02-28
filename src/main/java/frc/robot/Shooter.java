@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -54,11 +56,14 @@ public class Shooter
 
    Timer intakeTimer = new Timer();
    Timer shootTimer = new Timer();
+   BooleanSupplier manual;
+   double manualAngleCommand = 0.0;
 
    private MANIP_STATE state = MANIP_STATE.STOW;
 
-   public Shooter( )
+   public Shooter(  BooleanSupplier new_manual )
    {
+      manual = new_manual;
       sensor.setRangingMode(RangingMode.Short, 24);
 
       _angle = new CANSparkMax(56, MotorType.kBrushless);
@@ -129,6 +134,7 @@ public class Shooter
       state = MANIP_STATE.DISABLE;
 
       _angle.set ( 0.0 );
+      angleSetPosition( Math.toRadians(230.0 ));
       intakeSetVelocity( 0.0 );
       shooterSetVelocity( 0.0 );
    }
@@ -139,19 +145,19 @@ public class Shooter
       switch( state )
       {
          case DISABLE:
-            angleSetPosition( 0.0 );
+            angleSetPosition( Math.toRadians(230.0 ));
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case STOW:
-            angleSetPosition( 0.0 );
+            angleSetPosition( Math.toRadians(240.0 ) );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case INTAKE:
             if ( ! haveNote() )
             {
-               angleSetPosition( Math.toRadians(30.0) );
+               angleSetPosition( Math.toRadians(265.0) );
                intakeSetVelocity( 40.0 );
                shooterSetVelocity( 0.0 );
             }
@@ -173,7 +179,7 @@ public class Shooter
          case SPEAKER_TARGET:
             if ( haveNote( ) )
             {
-               intakeSetVelocity( 0.0 );
+               intakeSetVelocity( Math.toRadians(230.0 ) );
                calculateAngleAndSpeedFrom( distance );
                angleSetPosition( angle_target );
                shooterSetVelocity(topShooter_target);
@@ -203,8 +209,10 @@ public class Shooter
    public void periodic( double distance )
    {
       double angleRadians = en_angle.getAbsolutePosition() * 2.0 * Math.PI;
-      SmartDashboard.putNumber("angle position", Math.toDegrees( angleRadians ));
-      SmartDashboard.putNumber("TOF", sensor.getRange() );
+      SmartDashboard.putNumber("shooter/angle position", Math.toDegrees( angleRadians ));
+      SmartDashboard.putNumber("shooter/angle target", Math.toDegrees( pid_angle.getSetpoint() ));
+      SmartDashboard.putNumber("shooter/TOF", sensor.getRange() );
+      SmartDashboard.putBoolean("shooter/manual", manual.getAsBoolean() );
       switch( state )
       {
          case DISABLE:
@@ -237,7 +245,14 @@ public class Shooter
             }
             break;
       }
-      _angle.set( pid_angle.calculate( angleRadians ) );
+      if ( manual.getAsBoolean() )
+      {
+         _angle.set( manualAngleCommand );
+      }
+      else
+      {
+        _angle.setVoltage( pid_angle.calculate( angleRadians ) );
+      }
       shooterSetVelocity(topShooter_target);
    }
 
@@ -296,7 +311,7 @@ public class Shooter
 
    public void manualAngle( double speed )
    {
-      _angle.set(speed);
+      manualAngleCommand = speed;
    }
 
    private boolean intakeAtVelocity()
@@ -359,7 +374,7 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      angle_target   = Math.toRadians(0.0);
+      angle_target   = Math.toRadians(230.0);
       topShooter_target = 0.40;
    }
 }

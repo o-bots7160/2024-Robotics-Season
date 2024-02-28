@@ -28,30 +28,31 @@ public class Teleop implements OpModeInterface
    public void Init()
    {
       // zero gyro? maybe not... only in Robot.init?
+      robot.setManual( false );
    }
    public void Periodic()
    {
-      x  = -Joystick.getRawAxis(5);
+      x  = Joystick.getRawAxis(5);
       x  = Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/8.0;
-      y  = -Joystick.getRawAxis(4);
+      y  = Joystick.getRawAxis(4);
       y  = Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/8.0;
       hx = -Joystick.getRawAxis(0);
       hx = Math.pow( hx, 3.0 );
       hy = -Joystick.getRawAxis(1);
       hy = Math.pow( hy, 3.0 );
   
-      //if ( Joystick2.getRawButton(1))
-      //{
-      //   robot.driveBase.driveFacing( x, y, blueSpeaker );
-      // }
-      // else if ( Joystick2.getRawButton( 3 ) )
-      // {
-      //    robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
-      // }
-      // else
-      // {
-      //    robot.driveBase.drive( x, y, hx);//x, hy );
-      // }
+      if ( Joystick.getRawButton(7))
+      {
+        robot.driveBase.driveFacing( x, y, blueSpeaker );
+      }
+      else if ( Joystick.getRawButton( 9 ) )
+      {
+         robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
+      }
+      else
+      {
+         robot.driveBase.drive( x, y, hx);//x, hy );
+      }
       if (Buttons1.getRawButtonPressed(2)) // Travel
       {
          robot.shooter.setState(MANIP_STATE.STOW, 0.0);
@@ -65,18 +66,18 @@ public class Teleop implements OpModeInterface
          robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, 0.0 );
       }
       else if (Joystick.getRawButton(1))
-         {
-            robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, 0.0 );
-         }
-      else if (!Buttons1.getRawButton(4)) // Limelight On
+      {
+         robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, 0.0 );
+      }
+      else if (!Buttons1.getRawButton(4)) // Limelight Off
       {
          if (Buttons1.getRawButton(5)) // Rotate Up
          {
-            robot.shooter.manualAngle(0.1);
+            robot.shooter.manualAngle(-0.25);
          }
          else if (Buttons1.getRawButton(6)) // Rotate Down
          {
-            robot.shooter.manualAngle(-0.1);
+            robot.shooter.manualAngle(0.10);
          }
          else
          {
@@ -86,6 +87,14 @@ public class Teleop implements OpModeInterface
       else if (Buttons2.getRawButtonPressed(4)) // Amp
       {
          robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
+      }
+      if ( Buttons1.getRawButton(4)) // Limelight On
+      {
+         robot.setManual( false );
+      }
+      else
+      {
+         robot.setManual( true );
       }
       if (Buttons1.getRawButtonPressed(1)) // Lock
       {

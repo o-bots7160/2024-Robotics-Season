@@ -30,6 +30,7 @@ public class Auton1Speaker implements OpModeInterface
     {
         step = 0;
         initPose = robot.driveBase.getPose();
+        robot.setManual( false );
     }
 
     @Override
