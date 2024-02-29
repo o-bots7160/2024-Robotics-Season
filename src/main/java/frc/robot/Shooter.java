@@ -37,9 +37,11 @@ public class Shooter
    private TimeOfFlight sensor = new TimeOfFlight( 101 );
 
    private CANSparkMax _angle;
-   private PIDController pid_angle = new PIDController(0.7, 0.0, 0.0);
+   private PIDController pid_angle = new PIDController(6.65000, 0.0, 0.0);
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
+   final double travel_angle = Math.toRadians(226.0);
+   final double intake_angle = Math.toRadians(265.0);
 
    private TalonFX _intake;
    //private SparkPIDController pid_intake;
@@ -69,9 +71,9 @@ public class Shooter
       _angle = new CANSparkMax(56, MotorType.kBrushless);
       _angle.setSmartCurrentLimit(40);
       _angle.setInverted(false);
-      _angle.enableSoftLimit(SoftLimitDirection.kReverse, true);
+      _angle.enableSoftLimit(SoftLimitDirection.kReverse, false);
       _angle.setSoftLimit(SoftLimitDirection.kReverse, 0);        //lower limit //FIXME
-      _angle.enableSoftLimit(SoftLimitDirection.kForward, true);
+      _angle.enableSoftLimit(SoftLimitDirection.kForward, false);
       _angle.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
       _angle.setIdleMode(IdleMode.kBrake);
       pid_angle.enableContinuousInput(0.0, 2.0 * Math.PI);
@@ -134,7 +136,7 @@ public class Shooter
       state = MANIP_STATE.DISABLE;
 
       _angle.set ( 0.0 );
-      angleSetPosition( Math.toRadians(230.0 ));
+      angleSetPosition( travel_angle );
       intakeSetVelocity( 0.0 );
       shooterSetVelocity( 0.0 );
    }
@@ -145,19 +147,19 @@ public class Shooter
       switch( state )
       {
          case DISABLE:
-            angleSetPosition( Math.toRadians(230.0 ));
+            angleSetPosition( travel_angle );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case STOW:
-            angleSetPosition( Math.toRadians(240.0 ) );
+            angleSetPosition( travel_angle );
             intakeSetVelocity( 0.0 );
             shooterSetVelocity( 0.0 );
             break;
          case INTAKE:
             if ( ! haveNote() )
             {
-               angleSetPosition( Math.toRadians(265.0) );
+               angleSetPosition( intake_angle );
                intakeSetVelocity( 40.0 );
                shooterSetVelocity( 0.0 );
             }
@@ -179,7 +181,7 @@ public class Shooter
          case SPEAKER_TARGET:
             if ( haveNote( ) )
             {
-               intakeSetVelocity( Math.toRadians(230.0 ) );
+               intakeSetVelocity( 0.0 );
                calculateAngleAndSpeedFrom( distance );
                angleSetPosition( angle_target );
                shooterSetVelocity(topShooter_target);
@@ -247,11 +249,11 @@ public class Shooter
       }
       if ( manual.getAsBoolean() )
       {
-         _angle.set( manualAngleCommand );
+         _angle.setVoltage( manualAngleCommand );
       }
       else
       {
-        _angle.setVoltage( pid_angle.calculate( angleRadians ) );
+        _angle.setVoltage( pid_angle.calculate( angleRadians ) + Math.cos( angle_target - travel_angle ) * 0.45 );
       }
       shooterSetVelocity(topShooter_target);
    }
@@ -374,7 +376,7 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      angle_target   = Math.toRadians(230.0);
+      angle_target   = travel_angle;
       topShooter_target = 0.40;
    }
 }

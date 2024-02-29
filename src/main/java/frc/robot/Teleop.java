@@ -17,7 +17,7 @@ public class Teleop implements OpModeInterface
    Joystick Buttons2 = new Joystick(2); // Button Board
    double x, y, hx, hy;
 
-   public Translation2d blueSpeaker = new Translation2d( 1.3,  6.0);
+   public Translation2d blueSpeaker = new Translation2d( 0.5,  5.55);
    public Translation2d redSpeaker  = new Translation2d( 17.7592, 6.0);
    public Translation2d origin      = new Translation2d( 0.0, 0.0 );
 
@@ -33,9 +33,9 @@ public class Teleop implements OpModeInterface
    public void Periodic()
    {
       x  = Joystick.getRawAxis(5);
-      x  = Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/8.0;
+      x  = -Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
       y  = Joystick.getRawAxis(4);
-      y  = Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/8.0;
+      y  = -Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
       hx = -Joystick.getRawAxis(0);
       hx = Math.pow( hx, 3.0 );
       hy = -Joystick.getRawAxis(1);
@@ -73,11 +73,11 @@ public class Teleop implements OpModeInterface
       {
          if (Buttons1.getRawButton(5)) // Rotate Up
          {
-            robot.shooter.manualAngle(-0.25);
+            robot.shooter.manualAngle(-0.45);
          }
          else if (Buttons1.getRawButton(6)) // Rotate Down
          {
-            robot.shooter.manualAngle(0.10);
+            robot.shooter.manualAngle(1.2);
          }
          else
          {
