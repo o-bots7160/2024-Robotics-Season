@@ -30,6 +30,7 @@ public class RobotContainer
    public Translation2d origin      = new Translation2d( 0.0, 0.0 );
    public DriveBase driveBase = new DriveBase();
    public Shooter shooter = new Shooter( ()->{ return manual; } );
+   public Climber climber = new Climber();
 
    NetworkTable      table = NetworkTableInstance.getDefault().getTable("limelight");
    NetworkTableEntry tx      = table.getEntry("tx");

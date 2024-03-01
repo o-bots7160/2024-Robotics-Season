@@ -377,6 +377,6 @@ public class Shooter
    private void calculateAngleAndSpeedFrom( double distance )
    {
       angle_target   = travel_angle;
-      topShooter_target = 0.40;
+      topShooter_target = 0.70;
    }
 }

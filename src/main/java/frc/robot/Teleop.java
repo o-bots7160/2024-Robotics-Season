@@ -102,19 +102,27 @@ public class Teleop implements OpModeInterface
       }
       if (Buttons1.getRawButton(11)) // Left Climb Up
       {
-
+         robot.climber.leftExtend();
       }
       else if (Buttons1.getRawButton(7)) // Left Climb Down
       {
-
+         robot.climber.leftRetract();
+      }
+      else
+      {
+         robot.climber.leftStop();
       }
       if (Buttons2.getRawButton(6)) // Right Climb Up
       {
-
+         robot.climber.rightExtend();
       }
       else if (Buttons2.getRawButton(5)) // Right Climb Down
       {
-
+         robot.climber.rightRetract();
+      }
+      else
+      {
+         robot.climber.rightStop();
       }
       // else
       // {

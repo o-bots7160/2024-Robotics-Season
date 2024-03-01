@@ -3,7 +3,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.AutonModes.Auton1Speaker;
+import frc.robot.AutonModes.Auton1NearCenter;
+import frc.robot.AutonModes.Auton3FarAmp;
+import frc.robot.AutonModes.Auton4FarSource;
+import frc.robot.AutonModes.Auton4NearAmp;
 
 public class Robot extends TimedRobot
 {
@@ -18,7 +21,10 @@ public class Robot extends TimedRobot
    public void robotInit() 
    {
       robot = RobotContainer.getInstance();
-      m_chooser.setDefaultOption("Auton1Speaker", new Auton1Speaker());
+      m_chooser.setDefaultOption("Auton1NearCenter", new Auton1NearCenter());
+      m_chooser.addOption("Auton4FarAmp", new Auton4NearAmp());
+      m_chooser.addOption("Auton3FarAmp", new Auton3FarAmp());
+      m_chooser.addOption("Auton4FarSource", new Auton4FarSource());
       SmartDashboard.putData("Auto choices", m_chooser);
    }
 
