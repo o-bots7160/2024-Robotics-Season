@@ -67,7 +67,7 @@ public class Auton1NearCenter implements OpModeInterface
             case 3:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;

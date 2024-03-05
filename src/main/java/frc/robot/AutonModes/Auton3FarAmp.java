@@ -13,7 +13,7 @@ public class Auton3FarAmp implements OpModeInterface
     private RobotContainer robot;
 
     public Pose2d initPose = new Pose2d();
-    public Pose2d nextPose = new Pose2d(2.5, 7.0, new Rotation2d(0.0));
+    public Pose2d nextPose = new Pose2d(3.0, 6.9, new Rotation2d(0.0));
     public Timer autonTimer = new Timer();
     private int step = 0;
 
@@ -59,21 +59,22 @@ public class Auton3FarAmp implements OpModeInterface
                 {
                     autonTimer.stop();
                     autonTimer.reset();
+                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     step++;
                 }
                 break;
             case 3:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    autonTimer.start();
+                    nextPose = new Pose2d(3.0, 6.9, new Rotation2d(0.0));
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
             case 4:
-                if (autonTimer.get() > 0.1)
+                if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    autonTimer.stop();
-                    autonTimer.reset();
+                    robot.shooter.setState(MANIP_STATE.STOW, 0.0);
                     step++;
                 }
                 break;
@@ -97,6 +98,7 @@ public class Auton3FarAmp implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
@@ -116,6 +118,7 @@ public class Auton3FarAmp implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
             case 11:

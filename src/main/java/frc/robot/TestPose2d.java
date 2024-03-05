@@ -80,7 +80,8 @@ public class TestPose2d implements OpModeInterface {
       }
       else
       {
-         robot.drive(new Translation2d(0,0), 0, true, false);
+         //robot.drive(new Translation2d(0,0), 0, true, false);
+         robot.driveBase.drive(0, 0, 0);
       }
       if ( Joystick.getPOV() == 0 )
       {
@@ -94,6 +95,6 @@ public class TestPose2d implements OpModeInterface {
          control_pose = robot.driveBase.getPose();
          moving = false;
       }
-      //System.out.println("pose: " + control_pose);
+      System.out.println("moving: " + moving);
    }
 }

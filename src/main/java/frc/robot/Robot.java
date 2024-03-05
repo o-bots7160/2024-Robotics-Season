@@ -22,7 +22,7 @@ public class Robot extends TimedRobot
    {
       robot = RobotContainer.getInstance();
       m_chooser.setDefaultOption("Auton1NearCenter", new Auton1NearCenter());
-      m_chooser.addOption("Auton4FarAmp", new Auton4NearAmp());
+      m_chooser.addOption("Auton4NearAmp", new Auton4NearAmp());
       m_chooser.addOption("Auton3FarAmp", new Auton3FarAmp());
       m_chooser.addOption("Auton4FarSource", new Auton4FarSource());
       SmartDashboard.putData("Auto choices", m_chooser);

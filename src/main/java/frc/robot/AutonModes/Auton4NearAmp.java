@@ -158,7 +158,7 @@ public class Auton4NearAmp implements OpModeInterface
             case 15:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    nextPose = new Pose2d(4.0, 5.5, new Rotation2d(0.0));
+                    nextPose = new Pose2d(6.0, 5.5, new Rotation2d(0.0));
                     step++;
                 }
             case 16:

@@ -158,6 +158,7 @@ public class DriveBase
       }
       ctrl           =  x_y_PID.calculate( distance );
       control_active = !x_y_PID.atSetpoint( ) || !swerveController.thetaController.atSetpoint( );
+      System.out.println( "xy: " + x_y_PID.atSetpoint() + " rot: " + swerveController.thetaController.atSetpoint() );
 
       if ( ! x_y_PID.atSetpoint( ) )
       {
