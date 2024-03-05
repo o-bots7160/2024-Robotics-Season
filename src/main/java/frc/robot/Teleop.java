@@ -1,10 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Manipulator.MANIP_STATE;
 
@@ -16,10 +11,7 @@ public class Teleop implements OpModeInterface
    Joystick Buttons1 = new Joystick(1); // Button Board
    Joystick Buttons2 = new Joystick(2); // Button Board
    double x, y, hx, hy;
-
-   public Translation2d blueSpeaker = new Translation2d( 0.5,  5.55);
-   public Translation2d redSpeaker  = new Translation2d( 17.7592, 6.0);
-   public Translation2d origin      = new Translation2d( 0.0, 0.0 );
+   double stageAngle;
 
    public Teleop()
    {
@@ -37,17 +29,52 @@ public class Teleop implements OpModeInterface
       y  = Joystick.getRawAxis(4);
       y  = -Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
       hx = -Joystick.getRawAxis(0);
-      hx = Math.pow( hx, 3.0 );
+      hx = Math.pow( hx, 3.0 ) * robot.driveBase.getMaximumVelocity();
       hy = -Joystick.getRawAxis(1);
-      hy = Math.pow( hy, 3.0 );
+      hy = Math.pow( hy, 3.0 ) * robot.driveBase.getMaximumVelocity();
   
       if ( Joystick.getRawButton(7))
       {
-        robot.driveBase.driveFacing( x, y, blueSpeaker );
+        robot.driveBase.driveFacing( x, y, robot.landmarks.speaker );
       }
       else if ( Joystick.getRawButton( 9 ) )
       {
          robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
+      }
+      else if( Joystick.getRawButton(6) )
+      {
+         switch(robot.id)
+         {
+            case 11:
+            stageAngle = Math.toRadians(300.0);
+            break;
+
+            case 12:
+            stageAngle = Math.toRadians(60.0);
+            break;
+
+            case 13:
+            stageAngle = Math.toRadians(180.0);
+            break;
+
+            case 14:
+            stageAngle = Math.toRadians(0.0);
+            break;
+
+            case 15:
+            stageAngle = Math.toRadians(120.0);
+            break;
+
+            case 16:
+            stageAngle = Math.toRadians(240.0);
+            break;
+
+            default:
+            stageAngle = 0;
+            break;
+
+         }
+         robot.driveBase.driveHeading( x, y, stageAngle );
       }
       else
       {
@@ -124,6 +151,7 @@ public class Teleop implements OpModeInterface
       {
          robot.climber.rightStop();
       }
+
       // else
       // {
       //    robot.shooter.setState( MANIP_STATE.STOW, 0.0 );

@@ -1,12 +1,14 @@
 package frc.robot;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.LimelightHelpers.LimelightResults;
@@ -24,13 +26,16 @@ public class RobotContainer
    //  The devices this robot uses
    //
    //
-   private boolean manual = false;//private Joystick Buttons1 = new Joystick(1); // Button Board
-   public Translation2d blueSpeaker = new Translation2d( 1.3,  6.0);
-   public Translation2d redSpeaker  = new Translation2d( 17.7592, 6.0);
-   public Translation2d origin      = new Translation2d( 0.0, 0.0 );
-   public DriveBase driveBase = new DriveBase();
-   public Shooter shooter = new Shooter( ()->{ return manual; } );
-   public Climber climber = new Climber();
+   private boolean       manual = false;//private Joystick Buttons1 = new Joystick(1); // Button Board
+   private Alliance      currentAlliance = Alliance.Blue;
+   public Translation2d  blueSpeaker = new Translation2d( 1.3,  6.0);
+   public Translation2d  redSpeaker  = new Translation2d( 17.7592, 6.0);
+   public Translation2d  origin      = new Translation2d( 0.0, 0.0 );
+   public DriveBase      driveBase = new DriveBase();
+   public Shooter        shooter = new Shooter( ()->{ return manual; } );
+   public Climber        climber = new Climber();
+   public AllianceLandmarks landmarks = new AllianceLandmarks();
+   public int id;
 
    NetworkTable      table = NetworkTableInstance.getDefault().getTable("limelight");
    NetworkTableEntry tx      = table.getEntry("tx");
@@ -65,7 +70,7 @@ public class RobotContainer
       //read values periodically
       double x = tx.getDouble(0.0);
       double y = ty.getDouble(0.0);
-      double id   = tid.getDouble(0.0);
+      double tempid = tid.getDouble(0.0);
       double area = ta.getDouble(0.0); 
       double latency = tl.getDouble(0.0); 
       double capture = cl.getDouble(0.0); 
@@ -79,8 +84,9 @@ public class RobotContainer
          SmartDashboard.putNumber("LimelightArea", area);
 
          LimelightResults llresults = LimelightHelpers.getLatestResults("");
-         if ( id > 0 && llresults.targetingResults.valid )
+         if ( tempid > 0 && llresults.targetingResults.valid )
          {
+            id = (int)tempid;
             Pose2d ll_pose  = llresults.targetingResults.getBotPose2d();
             Pose2d new_pose = new Pose2d( ll_pose.getX() + 8.7532, ll_pose.getY() +4.106, ll_pose.getRotation() );
             // Use these lines to filter pose data from limelight
@@ -102,6 +108,19 @@ public class RobotContainer
       driveBase.periodic();
       Pose2d current_pose = driveBase.getPose();
       shooter.periodic( Math.hypot(current_pose.getX() - blueSpeaker.getX(),current_pose.getY() - blueSpeaker.getY()) );
+      //
+      //  Determine if the Alliance has changed
+      //
+      //
+      Optional<Alliance> ally = DriverStation.getAlliance();
+      if (ally.isPresent())
+      {
+         if ( ally.get() != currentAlliance)
+         {
+            currentAlliance = ally.get();
+            landmarks.newAlliance(currentAlliance);
+         }
+      }
    }
    public void disable()
    {

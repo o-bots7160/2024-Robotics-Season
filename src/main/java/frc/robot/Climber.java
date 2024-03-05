@@ -46,7 +46,7 @@ public class Climber {
 
    public void periodic()
    {
-    
+
    }
 
     public void leftExtend( )

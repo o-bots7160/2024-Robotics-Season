@@ -2,8 +2,6 @@ package frc.robot.AutonModes;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.OpModeInterface;
 import frc.robot.RobotContainer;
@@ -18,8 +16,6 @@ public class Auton3FarAmp implements OpModeInterface
     public Pose2d nextPose = new Pose2d(2.5, 7.0, new Rotation2d(0.0));
     public Timer autonTimer = new Timer();
     private int step = 0;
-    public Translation2d blueSpeaker = new Translation2d( 0.5,  5.55 );
-    public Translation2d redSpeaker  = new Translation2d(  8.308975, 1.442593 );
 
     public Auton3FarAmp()
     {
@@ -41,7 +37,7 @@ public class Auton3FarAmp implements OpModeInterface
         switch (step)
         {
             case 0:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, blueSpeaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, 0.0);
                     autonTimer.start();
@@ -82,7 +78,7 @@ public class Auton3FarAmp implements OpModeInterface
                 }
                 break;
             case 5:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, blueSpeaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
                     autonTimer.start();
                     step++;
@@ -131,7 +127,7 @@ public class Auton3FarAmp implements OpModeInterface
                 }
                 break;
             case 12:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, blueSpeaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
                     autonTimer.start();
                     step++;
