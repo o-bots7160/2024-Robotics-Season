@@ -58,6 +58,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
@@ -65,6 +66,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (autonTimer.get() > 0.1)
                 {
                     autonTimer.stop();
+                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
                     nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0)); //FIXME
                     step++;
@@ -74,6 +76,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
@@ -88,6 +91,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (autonTimer.get() > 0.2)
                 {
                     autonTimer.stop();
+                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
                     nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0)); //FIXME
                     step++;
@@ -97,6 +101,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
@@ -104,6 +109,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (autonTimer.get() > 0.1)
                 {
                     autonTimer.stop();
+                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
                     nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0)); //FIXME
                     step++;
@@ -113,6 +119,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
@@ -127,6 +134,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (autonTimer.get() > 0.2)
                 {
                     autonTimer.stop();
+                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
                     nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0)); //FIXME
                     step++;
@@ -136,6 +144,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
@@ -143,6 +152,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (autonTimer.get() > 0.1)
                 {
                     autonTimer.stop();
+                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
                     nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0)); //FIXME
                     step++;
@@ -152,6 +162,7 @@ public class Auton4FarSource implements OpModeInterface
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     autonTimer.start();
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;

@@ -13,8 +13,8 @@ public class Auton3FarAmp implements OpModeInterface
     private RobotContainer robot;
 
     public Pose2d initPose = new Pose2d();
-    public Pose2d nextPose = new Pose2d(3.0, 6.9, new Rotation2d(0.0));
-    public Timer autonTimer = new Timer();
+    public Pose2d nextPose = new Pose2d(3.0, 7.1, new Rotation2d(0.0));
+    public Timer autonTimer = new Timer(); //Centerline: nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0)); //FIXME
     private int step = 0;
 
     public Auton3FarAmp()
@@ -47,94 +47,67 @@ public class Auton3FarAmp implements OpModeInterface
             case 1:
                 if (autonTimer.get() > 0.3)
                 {
-                    autonTimer.stop();
-                    autonTimer.reset();
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    autonTimer.start();
-                    step++;
+                    if (autonTimer.get() > 0.6)
+                    {
+                        robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
+                        autonTimer.stop();
+                        autonTimer.reset();
+                        step++;
+                    }
                 }
                 break;
             case 2:
-                if (autonTimer.get() > 0.2)
+                if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    autonTimer.stop();
-                    autonTimer.reset();
-                    robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
             case 3:
-                if (!robot.driveBase.move_Pose2d(nextPose))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
-                    nextPose = new Pose2d(3.0, 6.9, new Rotation2d(0.0));
-                    robot.driveBase.stopDrive();
+                    autonTimer.start();
                     step++;
                 }
                 break;
             case 4:
-                if (!robot.driveBase.move_Pose2d(nextPose))
-                {
-                    robot.shooter.setState(MANIP_STATE.STOW, 0.0);
-                    step++;
-                }
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
+                    if (autonTimer.get() > 0.5)
+                    {
+                        robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
+                        autonTimer.stop();
+                        autonTimer.reset();
+                        nextPose = new Pose2d(6.1, 6.5, new Rotation2d(0.0));
+                        step++;
+                    }
                 break;
             case 5:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
+                if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    autonTimer.start();
+                    robot.driveBase.stopDrive();
+                    nextPose = new Pose2d(2.4, 6.5, new Rotation2d(0.0));
                     step++;
                 }
                 break;
             case 6:
-                if (autonTimer.get() > 0.2)
+                if (!robot.driveBase.move_Pose2d(nextPose))
                 {
-                    autonTimer.stop();
-                    autonTimer.reset();
-                    nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0)); //FIXME
+                    robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
             case 7:
-                if (!robot.driveBase.move_Pose2d(nextPose))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
                     autonTimer.start();
-                    robot.driveBase.stopDrive();
+                    autonTimer.start();
                     step++;
                 }
                 break;
             case 8:
-                if (autonTimer.get() > 0.1)
-                {
-                    autonTimer.stop();
-                    autonTimer.reset();
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
                     step++;
-                }
-                break;
-            case 9:
-                    nextPose = new Pose2d(2.5, 7.0, new Rotation2d(0.0));
-                    step++;
-                break;
-            case 10:
-                if (!robot.driveBase.move_Pose2d(nextPose))
-                {
-                    autonTimer.start();
-                    robot.driveBase.stopDrive();
-                    step++;
-                }
-            case 11:
-                if (autonTimer.get() > 0.1)
-                {
-                    autonTimer.stop();
-                    autonTimer.reset();
-                    step++;
-                }
-                break;
-            case 12:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
-                {
-                    autonTimer.start();
-                    step++;
-                }
                 break;
             default:
                 break;

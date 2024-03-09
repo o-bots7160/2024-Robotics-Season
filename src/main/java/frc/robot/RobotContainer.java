@@ -35,6 +35,7 @@ public class RobotContainer
    public Shooter        shooter = new Shooter( ()->{ return manual; } );
    public Climber        climber = new Climber();
    public AllianceLandmarks landmarks = new AllianceLandmarks();
+   public double         target_distance;
    public int id;
 
    NetworkTable      table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -65,6 +66,19 @@ public class RobotContainer
       //driveBase.drive( translation, rotation, fieldRelative, isOpenLoop );
    }    
 
+   public void opmodeInit( )
+   {
+      //
+      //  Determine if the Alliance has changed
+      //
+      //
+      Optional<Alliance> ally = DriverStation.getAlliance();
+      if (ally.isPresent())
+      {
+         currentAlliance = ally.get();
+         landmarks.newAlliance(currentAlliance);
+      }
+   }
    public void periodic()
    {
       //read values periodically
@@ -107,20 +121,8 @@ public class RobotContainer
       }
       driveBase.periodic();
       Pose2d current_pose = driveBase.getPose();
-      shooter.periodic( Math.hypot(current_pose.getX() - blueSpeaker.getX(),current_pose.getY() - blueSpeaker.getY()) );
-      //
-      //  Determine if the Alliance has changed
-      //
-      //
-      Optional<Alliance> ally = DriverStation.getAlliance();
-      if (ally.isPresent())
-      {
-         if ( ally.get() != currentAlliance)
-         {
-            currentAlliance = ally.get();
-            landmarks.newAlliance(currentAlliance);
-         }
-      }
+      target_distance = Math.hypot(current_pose.getX() - landmarks.speaker.getX(), current_pose.getY() - landmarks.speaker.getY());
+      shooter.periodic( target_distance );
    }
    public void disable()
    {

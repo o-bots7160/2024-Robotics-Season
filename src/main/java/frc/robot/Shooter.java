@@ -63,9 +63,9 @@ public class Shooter
       _angle = new CANSparkMax(56, MotorType.kBrushless);
       _angle.setSmartCurrentLimit(40);
       _angle.setInverted(false);
-      _angle.enableSoftLimit(SoftLimitDirection.kReverse, false);
+      _angle.enableSoftLimit(SoftLimitDirection.kReverse, true);
       _angle.setSoftLimit(SoftLimitDirection.kReverse, 0);        //lower limit //FIXME
-      _angle.enableSoftLimit(SoftLimitDirection.kForward, false);
+      _angle.enableSoftLimit(SoftLimitDirection.kForward, true);
       _angle.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
       _angle.setIdleMode(IdleMode.kBrake);
       pid_angle.enableContinuousInput(0.0, 2.0 * Math.PI);
@@ -161,14 +161,28 @@ public class Shooter
             }
             break;
          case AMPLIFIER_TARGET:
-            //angleSetPosition( 0.0 );
-            // intake_target  =  0.0;
-            // topShooter_target =  0.0;  // Set speed for amplifier
+            if ( haveNote( ) )
+            {
+               intakeSetVelocity( 0.0 );
+               angleSetPosition( travel_angle );
+               shooterSetVelocity( 20.0 );
+            }
+            else
+            {
+               setState(MANIP_STATE.STOW, distance);
+            }
             break;
          case AMPLIFIER_SHOOT:
-            //angleSetPosition( 0.0 );
-            // intake_target  = 10.0;  // Set for passing to topShooter
-            // topShooter_target = 10.0;  // Set speed for amplifier
+            if ( haveNote( ) )
+            {
+               intakeSetVelocity( 80.0 );
+               angleSetPosition( travel_angle );
+               shooterSetVelocity( 20.0 );
+            }
+            else
+            {
+               setState(MANIP_STATE.STOW, distance);
+            }
             break;
          case SPEAKER_TARGET:
             if ( haveNote( ) )
@@ -197,7 +211,7 @@ public class Shooter
             }
             break;
       }
-      System.out.println( "state:" + state );
+      //System.out.println( "state:" + state );
    }
 
    public void periodic( double distance )
@@ -224,8 +238,16 @@ public class Shooter
             break;
          case AMPLIFIER_TARGET:
          case AMPLIFIER_SHOOT:
-            // intakeSetVelocity ( intake_target  );
-            //topShooterSetVelocity( topShooter_target );
+            if ( ! haveNote() )
+            {
+               setState( MANIP_STATE.STOW, distance );
+            }
+            else
+            {
+               intakeSetVelocity( 80.0 );
+               angleSetPosition( travel_angle );
+               shooterSetVelocity( 20.0 );
+            }
             break;
          case SPEAKER_TARGET:
          case SPEAKER_SHOOT:
@@ -301,11 +323,15 @@ public class Shooter
       angle_target = new_target;
       pid_angle.setSetpoint(new_target);
       //_angle.set( new_target );
+      _angle.enableSoftLimit(SoftLimitDirection.kReverse, true);
+      _angle.enableSoftLimit(SoftLimitDirection.kForward, true);
    }
 
    public void manualAngle( double speed )
    {
       manualAngleCommand = speed;
+      _angle.enableSoftLimit(SoftLimitDirection.kReverse, false);
+      _angle.enableSoftLimit(SoftLimitDirection.kForward, false);
    }
 
    private boolean intakeAtVelocity()
@@ -368,7 +394,21 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      angle_target   = travel_angle;
-      topShooter_target = 0.70;
+      double min_distance = 2.4892;
+      double max_distance = 10.16;
+      double max_angle    = (5*Math.PI)/18;
+
+      if (distance < min_distance)
+      {
+         distance = min_distance;
+      }
+      else if (distance > max_distance)
+      {
+         distance = max_distance;
+      }
+
+      //angle_target   = travel_angle; 
+      angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))-(max_angle));
+      topShooter_target = 0.55;
    }
 }

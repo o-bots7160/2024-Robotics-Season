@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.AutonModes.Auton1NearCenter;
 import frc.robot.AutonModes.Auton3FarAmp;
+import frc.robot.AutonModes.Auton3NearAmp;
 import frc.robot.AutonModes.Auton4FarSource;
 import frc.robot.AutonModes.Auton4NearAmp;
 
@@ -25,6 +26,7 @@ public class Robot extends TimedRobot
       m_chooser.addOption("Auton4NearAmp", new Auton4NearAmp());
       m_chooser.addOption("Auton3FarAmp", new Auton3FarAmp());
       m_chooser.addOption("Auton4FarSource", new Auton4FarSource());
+      m_chooser.addOption("Auton3NearAmp", new Auton3NearAmp());
       SmartDashboard.putData("Auto choices", m_chooser);
    }
 
@@ -38,6 +40,7 @@ public class Robot extends TimedRobot
    @Override
    public void autonomousInit()
    {
+      robot.opmodeInit();
       auton = m_chooser.getSelected();
       //System.out.println("Auto selected: " + auton.toString());
 
@@ -54,6 +57,7 @@ public class Robot extends TimedRobot
    @Override
    public void teleopInit()
    {
+      robot.opmodeInit();
       teleop = new Teleop();
       teleop.Init();
    }
@@ -78,6 +82,7 @@ public class Robot extends TimedRobot
 
    public void testInit()
   {
+    robot.opmodeInit();
     test = new TestPose2d();
     test.Init();
   }

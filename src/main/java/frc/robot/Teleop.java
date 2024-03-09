@@ -6,6 +6,7 @@ import frc.robot.Manipulator.MANIP_STATE;
 public class Teleop implements OpModeInterface
 {
    private RobotContainer robot;
+   private UI UI = new UI();
 
    Joystick Joystick = new Joystick(0); // Joystick
    Joystick Buttons1 = new Joystick(1); // Button Board
@@ -25,23 +26,37 @@ public class Teleop implements OpModeInterface
    public void Periodic()
    {
       x  = Joystick.getRawAxis(5);
-      x  = -Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
+      x  = robot.landmarks.joystickInversion * Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
       y  = Joystick.getRawAxis(4);
-      y  = -Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
+      y  = robot.landmarks.joystickInversion * Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
       hx = -Joystick.getRawAxis(0);
       hx = Math.pow( hx, 3.0 ) * robot.driveBase.getMaximumVelocity();
       hy = -Joystick.getRawAxis(1);
       hy = Math.pow( hy, 3.0 ) * robot.driveBase.getMaximumVelocity();
+      double turboPower = 1.0-Joystick.getRawAxis(2)+0.1;
+      double slowPower  = 3.0;
   
-      if ( Joystick.getRawButton(7))
+      if ( UI.speakerTarget() || UI.speakerShoot() )
       {
-        robot.driveBase.driveFacing( x, y, robot.landmarks.speaker );
+         robot.driveBase.driveFacing( x, y, robot.landmarks.speaker );
       }
-      else if ( Joystick.getRawButton( 9 ) )
+      else if ( Joystick.getPOV() == 270 )
+      {
+         robot.driveBase.driveHeading( x, y, Math.PI/2.0 );
+      }
+      else if ( Joystick.getPOV() == 0 )
+      {
+         robot.driveBase.driveHeading( x, y, 0.0 );
+      }
+      else if ( Joystick.getPOV() == 90 )
       {
          robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
       }
-      else if( Joystick.getRawButton(6) )
+      else if ( Joystick.getPOV() == 180 )
+      {
+         robot.driveBase.driveFacing( x, y, robot.landmarks.speaker );
+      }
+      else if( Joystick.getRawButton(7))
       {
          switch(robot.id)
          {
@@ -76,33 +91,180 @@ public class Teleop implements OpModeInterface
          }
          robot.driveBase.driveHeading( x, y, stageAngle );
       }
+      else if ( UI.lockActive() )
+      {
+         robot.driveBase.stopDrive();
+      }
+      else if ( Joystick.getRawAxis(2) > 0.1 )
+      {
+         robot.driveBase.drive( x/turboPower, y/turboPower, hx*8 );
+      }
+      else if ( Joystick.getRawButton(5))
+      {
+         robot.driveBase.drive( x/slowPower, y/slowPower, hx/slowPower);
+      }
       else
       {
-         robot.driveBase.drive( x, y, hx);//x, hy );
+         robot.driveBase.drive( x, y, hx );//x, hy );
       }
-      if (Buttons1.getRawButtonPressed(2)) // Travel
-      {
-         robot.shooter.setState(MANIP_STATE.STOW, 0.0);
-      }
-      if (Joystick.getRawAxis(3) > 0.25) // Intake
+      // if (Buttons1.getRawButtonPressed(2)) // Travel
+      // {
+      //    robot.shooter.setState(MANIP_STATE.STOW, 0.0);
+      // }
+      // if (Joystick.getRawAxis(3) <= 0.25)
+      // {
+      //    robot.shooter.setState(MANIP_STATE.STOW, 0.0);
+      // }
+      // else if (Joystick.getRawAxis(3) > 0.25) // Intake
+      // {
+      //    robot.shooter.setState( MANIP_STATE.INTAKE, 0.0 );
+      // }
+      // if (Buttons1.getRawButtonPressed(3)) // Shoot
+      // {
+      //    robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, robot.target_distance );
+      // }
+      // else if (Joystick.getRawButtonPressed(1))
+      // {
+      //    robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, robot.target_distance );
+      // }
+      // else if (!Buttons1.getRawButton(4)) // Limelight Off
+      // {
+      //    if (Buttons1.getRawButton(5)) // Rotate Up
+      //    {
+      //       robot.shooter.manualAngle(-0.45);
+      //    }
+      //    else if (Buttons1.getRawButton(6)) // Rotate Down
+      //    {
+      //       robot.shooter.manualAngle(1.2);
+      //    }
+      //    else
+      //    {
+      //       robot.shooter.manualAngle(0.0);
+      //    }
+      // }
+      // else if (Buttons2.getRawButtonPressed(4)) // Amp
+      // {
+      //    robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
+      // }
+      // if ( Buttons1.getRawButton(4)) // Limelight On
+      // {
+      //    robot.setManual( false );
+      // }
+      // else
+      // {
+      //    robot.setManual( true );
+      // }
+      // if (Buttons1.getRawButton(11)) // Left Climb Up
+      // {
+      //    robot.climber.leftExtend();
+      // }
+      // else if (Buttons1.getRawButton(7)) // Left Climb Down
+      // {
+      //    robot.climber.leftRetract();
+      // }
+      // else
+      // {
+      //    robot.climber.leftStop();
+      // }
+      // if (Buttons2.getRawButton(6)) // Right Climb Up
+      // {
+      //    robot.climber.rightExtend();
+      // }
+      // else if (Buttons2.getRawButton(5)) // Right Climb Down
+      // {
+      //    robot.climber.rightRetract();
+      // }
+      // else
+      // {
+      //    robot.climber.rightStop();
+      // }
+
+      if( UI.intakeActive() ) // Intake
       {
          robot.shooter.setState( MANIP_STATE.INTAKE, 0.0 );
       }
-      else if (Buttons1.getRawButtonPressed(3)) // Shoot
+      else if( UI.speakerShoot() ) // Speaker Shoot
       {
-         robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, 0.0 );
+         robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, robot.target_distance );
       }
-      else if (Joystick.getRawButton(1))
+      else if( UI.speakerTarget() ) // Speaker Target
       {
-         robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, 0.0 );
+         robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, robot.target_distance );
       }
-      else if (!Buttons1.getRawButton(4)) // Limelight Off
+      else if ( UI.ampTarget() ) // Amp
       {
-         if (Buttons1.getRawButton(5)) // Rotate Up
+         robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
+      }
+      else if ( UI.ampShoot() )
+      {
+         robot.shooter.setState( MANIP_STATE.AMPLIFIER_SHOOT, 0.0 );
+      }
+      else if( UI.stowActive() ) // Stow
+      {
+         robot.shooter.setState( MANIP_STATE.STOW, 0.0);
+      }
+      else
+      {
+         robot.shooter.setState( MANIP_STATE.STOW,  0.0 );
+      }
+      
+      // Left Climber
+      if( UI.leftClimbExtend() ) // Left Climb Extend
+      {
+         robot.climber.leftExtend();
+      }
+      else if( UI.leftClimbRetract() ) // Left Climb Retract
+      {
+         robot.climber.leftRetract();
+      }
+      else
+      {
+         robot.climber.leftStop();
+      }
+
+
+      // Right Climber
+      if( UI.rightClimbExtend() ) // Right Climb Extend
+      {
+         robot.climber.rightExtend();
+      }
+      else if( UI.rightClimbRetract() ) // Right Climb Retract
+      {
+         robot.climber.rightRetract();
+      }
+      else
+      {
+         robot.climber.rightStop();
+      }
+
+
+      // Manual Angle Control
+      if( UI.manualRotUp() ) // Rotation Up
+      {
+         robot.shooter.manualAngle(-0.45);
+      }
+      else if( UI.manualRotDown() ) // Rotation Down
+      {
+         robot.shooter.manualAngle(1.2);
+      }
+      else
+      {
+         robot.shooter.manualAngle(0.0);
+      }
+
+      // Limelight
+      if( UI.limelightActive() ) // Limelight On
+      {
+         robot.setManual( false );
+      }
+      else // Limelight Off
+      {
+         robot.setManual( true );
+         if( UI.manualRotUp() ) // Rotation Up
          {
             robot.shooter.manualAngle(-0.45);
          }
-         else if (Buttons1.getRawButton(6)) // Rotate Down
+         else if( UI.manualRotDown() ) // Rotation Down
          {
             robot.shooter.manualAngle(1.2);
          }
@@ -111,46 +273,8 @@ public class Teleop implements OpModeInterface
             robot.shooter.manualAngle(0.0);
          }
       }
-      else if (Buttons2.getRawButtonPressed(4)) // Amp
-      {
-         robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
-      }
-      if ( Buttons1.getRawButton(4)) // Limelight On
-      {
-         robot.setManual( false );
-      }
-      else
-      {
-         robot.setManual( true );
-      }
-      if (Buttons1.getRawButtonPressed(1)) // Lock
-      {
-         robot.driveBase.stopDrive();
-      }
-      if (Buttons1.getRawButton(11)) // Left Climb Up
-      {
-         robot.climber.leftExtend();
-      }
-      else if (Buttons1.getRawButton(7)) // Left Climb Down
-      {
-         robot.climber.leftRetract();
-      }
-      else
-      {
-         robot.climber.leftStop();
-      }
-      if (Buttons2.getRawButton(6)) // Right Climb Up
-      {
-         robot.climber.rightExtend();
-      }
-      else if (Buttons2.getRawButton(5)) // Right Climb Down
-      {
-         robot.climber.rightRetract();
-      }
-      else
-      {
-         robot.climber.rightStop();
-      }
+      
+
 
       // else
       // {

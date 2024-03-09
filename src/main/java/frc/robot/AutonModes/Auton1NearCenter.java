@@ -57,14 +57,6 @@ public class Auton1NearCenter implements OpModeInterface
                 }
                 break;
             case 2:
-                if (autonTimer.get() > 0.2)
-                {
-                    autonTimer.stop();
-                    autonTimer.reset();
-                    step++;
-                }
-                break;
-            case 3:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     robot.driveBase.stopDrive();

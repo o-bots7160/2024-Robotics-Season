@@ -2,18 +2,19 @@ package frc.robot;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Manipulator
 {
    private Shooter  _shooter;
-   private Solenoid _extension0 = new Solenoid( PneumaticsModuleType.REVPH, 0 );
-   private Solenoid _extension1 = new Solenoid( PneumaticsModuleType.REVPH, 1 );
-   private Solenoid _elbow0     = new Solenoid( PneumaticsModuleType.REVPH, 2 );
-   private Solenoid _elbow1     = new Solenoid( PneumaticsModuleType.REVPH, 3 );
+   private DoubleSolenoid _extension0 = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 0, 1 );
+   private DoubleSolenoid _elbow0     = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 2, 3 );
+   private DoubleSolenoid _elbow1     = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 4, 5 );
 
    public static enum MANIP_STATE
    {
@@ -36,9 +37,9 @@ public class Manipulator
 
    public void disable( ) 
    {
-      _shooter.disable(       );
-      extend          ( false );
-      elbowUp         ( false );
+      _shooter.disable();
+      retract();
+      elbowDown();
    }
 
    public void setState( MANIP_STATE new_state )
@@ -57,27 +58,27 @@ public class Manipulator
             _shooter.setState( manip_state, distance );
             if ( _shooter.atPosition( ) )
             {
-               extend( false );
+               retract();
             }
-            elbowUp( false );
+            elbowDown();
             break;
          case INTAKE:
             if ( _shooter.haveNote( ) )
             {
                _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
-               extend( false );
+               retract();
             }
             else
             {
                _shooter.setState( manip_state, distance ); // does this need a delay?
-               extend( true );
+               extend();
             }
-            elbowUp( false );
+            elbowDown();
             break;
          case AMPLIFIER_TARGET:
             _shooter.setState( manip_state, distance ); // does this need a delay?
-            extend ( false );         // does this need to be true to reach the amp?
-            elbowUp( true  );
+            extend();         // does this need to be true to reach the amp?
+            elbowUp();
             break;
          case AMPLIFIER_SHOOT:
             if ( _shooter.haveNote( ) )
@@ -90,20 +91,20 @@ public class Manipulator
                {
                   _shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, distance );
                }
-               extend ( false );         // does this need to be true to reach the amp?
-               elbowUp( true  );
+               extend();         // does this need to be true to reach the amp?
+               elbowUp();
             }
             else
             {
                _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
-               extend ( false );         // does this need to be true to reach the amp?
-               elbowUp( false );
+               retract();         // does this need to be true to reach the amp?
+               elbowDown();
             }
             break;
          case SPEAKER_TARGET:
             _shooter.setState( manip_state, 0.0 ); // does this need a delay?
-            extend ( false );
-            elbowUp( false );
+            retract();
+            elbowDown();
             break;
          case SPEAKER_SHOOT:
             if ( _shooter.haveNote( ) )
@@ -121,21 +122,29 @@ public class Manipulator
             {
                _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
             }
-            extend ( false );
-            elbowUp( false );
+            retract ();
+            elbowDown();
             break;
       }
       _shooter.periodic( distance );
    }
-   public void extend( boolean value )
+   public void extend()
    {
-      _extension0.set( value );
-      _extension1.set( value );
+      _extension0.set( Value.kReverse );
    }
-   public void elbowUp( boolean value )
+   public void retract()
    {
-      _elbow0.set( value );
-      _elbow1.set( value );
+      _extension0.set( Value.kForward );
+   }
+   public void elbowUp()
+   {
+      _elbow0.set( Value.kReverse );
+      _elbow1.set( Value.kForward );
+   }
+   public void elbowDown()
+   {
+      _elbow0.set( Value.kForward );
+      _elbow1.set( Value.kReverse );
    }
    public boolean atPosition()
    {
