@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class DriveBase
 {
@@ -24,7 +26,7 @@ public class DriveBase
    private Translation2d x_y_ctrl = new Translation2d( 0.0, 0.0 );
 
    //                                                 kP      Ki      Kd
-   private PIDController x_y_PID = new PIDController( 2.7, 0.0, 0.0 );
+   private PIDController x_y_PID = new PIDController( 6.0, 0.0, 0.0 );
    //
    //   Create a YAGSL swerve drive and PID controllers
    //
@@ -36,7 +38,7 @@ public class DriveBase
          swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(),"swerve")).createSwerveDrive(maximumSpeed);
          swerveController = swerveDrive.swerveController;
          swerveController.thetaController.setTolerance( Math.PI/90.0 );
-         swerveController.thetaController.setPID(0.8, 0.0, 0.0325);
+         swerveController.thetaController.setPID(1.0, 0.0, 0.02);
       }
       catch (Exception e)
       {

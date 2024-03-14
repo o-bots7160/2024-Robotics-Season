@@ -23,6 +23,9 @@ public class UI
             intake_active = true;
             speaker_shoot = false;
             speaker_target = false;
+            amp_shoot = false;
+            amp_target = false;
+            stow_active = false;
         }
         else if (Joystick.getRawAxis(3) <= 0.25)
         {
@@ -33,16 +36,20 @@ public class UI
 
     public boolean speakerShoot()
     {
-        if (Joystick.getRawButtonPressed(6) && !amp_shoot && speaker_shoot)
+        if (Joystick.getRawButton(6) && speaker_target)
         {
-            speaker_shoot = !speaker_shoot;
+            speaker_shoot = true;
+        }
+        else
+        {
+            speaker_shoot = false;
         }
         return speaker_shoot;
     }
     
     public boolean speakerTarget()
     {
-        if (Buttons1.getRawButtonPressed(3) && !amp_target && speaker_target)
+        if (Buttons1.getRawButtonPressed(3))
         {
             speaker_target = !speaker_target;
         }
@@ -51,16 +58,20 @@ public class UI
 
     public boolean ampShoot()
     {
-        if (Joystick.getRawButtonPressed(3) && amp_shoot && !speaker_shoot)
+        if (Joystick.getRawButton(6) && amp_target && !speaker_target)
         {
-            amp_target = !amp_target;
+            amp_shoot = true;
         }
-        return speaker_target;
+        else
+        {
+            amp_shoot = false;
+        }
+        return amp_shoot;
     }
 
     public boolean ampTarget()
     {
-        if (Buttons1.getRawButtonPressed(3) && amp_target && !speaker_shoot)
+        if (Buttons2.getRawButtonPressed(4))
         {
             amp_target = !amp_target;
         }
@@ -75,6 +86,8 @@ public class UI
             intake_active = false;
             speaker_shoot = false;
             speaker_target = false;
+            amp_shoot = false;
+            amp_target = false;
         }
         else if (Buttons1.getRawButtonReleased(2))
         {

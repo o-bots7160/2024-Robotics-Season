@@ -32,7 +32,8 @@ public class RobotContainer
    public Translation2d  redSpeaker  = new Translation2d( 17.7592, 6.0);
    public Translation2d  origin      = new Translation2d( 0.0, 0.0 );
    public DriveBase      driveBase = new DriveBase();
-   public Shooter        shooter = new Shooter( ()->{ return manual; } );
+   public Manipulator    shooter   = new Manipulator( ()->{ return manual; } );
+   //public Shooter        shooter = new Shooter( ()->{ return manual; } );
    public Climber        climber = new Climber();
    public AllianceLandmarks landmarks = new AllianceLandmarks();
    public double         target_distance;

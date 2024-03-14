@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -26,14 +27,16 @@ import frc.robot.Manipulator.MANIP_STATE;
 
 public class Shooter
 {
-   private TimeOfFlight sensor = new TimeOfFlight( 101 );
+   private TimeOfFlight sensor = new TimeOfFlight( 0 );
 
    private CANSparkMax _angle;
    private PIDController pid_angle = new PIDController(6.65000, 0.0, 0.0);
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
-   final double travel_angle = Math.toRadians(226.0);
-   final double intake_angle = Math.toRadians(265.0);
+   final double travel_angle = Math.toRadians(290.0);
+   final double intake_angle = Math.toRadians(340.0);
+   final double amp_angle    = Math.toRadians(320.0);
+   private RelativeEncoder angleEncoder;
 
    private TalonFX _intake;
    //private SparkPIDController pid_intake;
@@ -54,6 +57,7 @@ public class Shooter
    double manualAngleCommand = 0.0;
 
    private MANIP_STATE state = MANIP_STATE.STOW;
+   boolean hasNote = false;
 
    public Shooter(  BooleanSupplier new_manual )
    {
@@ -68,7 +72,10 @@ public class Shooter
       _angle.enableSoftLimit(SoftLimitDirection.kForward, true);
       _angle.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
       _angle.setIdleMode(IdleMode.kBrake);
+      angleEncoder = _angle.getEncoder( );
+
       pid_angle.enableContinuousInput(0.0, 2.0 * Math.PI);
+      pid_angle.setTolerance(Math.toRadians(1.0));
       //pid_angle.setIZone      ( 0.0 );
       //pid_angle.setFF         ( 0.0 );
       //pid_angle.setOutputRange( -0.9, 0.9 );
@@ -164,8 +171,8 @@ public class Shooter
             if ( haveNote( ) )
             {
                intakeSetVelocity( 0.0 );
-               angleSetPosition( travel_angle );
-               shooterSetVelocity( 20.0 );
+               angleSetPosition( amp_angle );
+               shooterSetVelocity( 0.5 );
             }
             else
             {
@@ -176,8 +183,8 @@ public class Shooter
             if ( haveNote( ) )
             {
                intakeSetVelocity( 80.0 );
-               angleSetPosition( travel_angle );
-               shooterSetVelocity( 20.0 );
+               angleSetPosition( amp_angle );
+               shooterSetVelocity( 0.5 );
             }
             else
             {
@@ -221,6 +228,7 @@ public class Shooter
       SmartDashboard.putNumber("shooter/angle target", Math.toDegrees( pid_angle.getSetpoint() ));
       SmartDashboard.putNumber("shooter/TOF", sensor.getRange() );
       SmartDashboard.putBoolean("shooter/manual", manual.getAsBoolean() );
+      SmartDashboard.putNumber("shooter/encoder", angleEncoder.getPosition() );
       switch( state )
       {
          case DISABLE:
@@ -237,6 +245,17 @@ public class Shooter
             }
             break;
          case AMPLIFIER_TARGET:
+            if ( ! haveNote() )
+            {
+               setState( MANIP_STATE.STOW, distance );
+            }
+            else
+            {
+               intakeSetVelocity( 0.0 );
+               angleSetPosition( amp_angle );
+               shooterSetVelocity( 0.5 );
+            }
+            break;
          case AMPLIFIER_SHOOT:
             if ( ! haveNote() )
             {
@@ -245,11 +264,23 @@ public class Shooter
             else
             {
                intakeSetVelocity( 80.0 );
-               angleSetPosition( travel_angle );
-               shooterSetVelocity( 20.0 );
+               angleSetPosition( amp_angle );
+               shooterSetVelocity( 0.5 );
             }
             break;
          case SPEAKER_TARGET:
+            if ( ! haveNote() )
+            {
+               setState( MANIP_STATE.STOW, distance );
+            }
+            else
+            {
+               intakeSetVelocity(0.0);
+               calculateAngleAndSpeedFrom( distance );
+               angleSetPosition( angle_target );
+               shooterSetVelocity(topShooter_target);
+            }
+            break;
          case SPEAKER_SHOOT:
             if ( ! haveNote() )
             {
@@ -257,7 +288,10 @@ public class Shooter
             }
             else
             {
+               intakeSetVelocity(80.0);
                calculateAngleAndSpeedFrom( distance );
+               angleSetPosition( angle_target );
+               shooterSetVelocity(topShooter_target);
             }
             break;
       }
@@ -267,7 +301,7 @@ public class Shooter
       }
       else
       {
-        _angle.setVoltage( pid_angle.calculate( angleRadians ) + Math.cos( angle_target - travel_angle ) * 0.45 );
+        _angle.setVoltage( pid_angle.calculate( angleRadians ) + Math.cos( angle_target - travel_angle ) * -0.45 );
       }
       shooterSetVelocity(topShooter_target);
    }
@@ -292,7 +326,25 @@ public class Shooter
          if ( distance < 215.0 )
          {
             return_value = true;
+            hasNote = true;
          }
+         // else
+         // {
+         //    if (hasNote)
+         //    {
+         //       intakeTimer.reset();
+         //       intakeTimer.start();
+         //    }
+         //    if ( intakeTimer.get() > 1.0 )
+         //    {
+         //       return_value = false;
+         //    }
+         //    else
+         //    {
+         //       return_value = true;
+         //    }
+         //    hasNote = false;
+         // }
       //}
       return ( return_value );
    }
@@ -330,6 +382,13 @@ public class Shooter
    public void manualAngle( double speed )
    {
       manualAngleCommand = speed;
+      if ( speed < 0 )
+      {
+         if ( angleEncoder.getPosition() < 0.0 )
+         {
+            angleEncoder.setPosition( 0.0 );
+         }
+      }
       _angle.enableSoftLimit(SoftLimitDirection.kReverse, false);
       _angle.enableSoftLimit(SoftLimitDirection.kForward, false);
    }
@@ -394,9 +453,9 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      double min_distance = 2.4892;
-      double max_distance = 10.16;
-      double max_angle    = (5*Math.PI)/18;
+      double min_distance = 1.2446;
+      double max_distance = 2.7;
+      double max_angle    = Math.toRadians(14);
 
       if (distance < min_distance)
       {
@@ -408,7 +467,7 @@ public class Shooter
       }
 
       //angle_target   = travel_angle; 
-      angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))-(max_angle));
-      topShooter_target = 0.55;
+      angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))) - Math.toRadians(2.0);
+      topShooter_target = 0.65;
    }
 }

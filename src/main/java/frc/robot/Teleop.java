@@ -13,6 +13,7 @@ public class Teleop implements OpModeInterface
    Joystick Buttons2 = new Joystick(2); // Button Board
    double x, y, hx, hy;
    double stageAngle;
+   boolean wasIntaking = false;
 
    public Teleop()
    {
@@ -36,7 +37,7 @@ public class Teleop implements OpModeInterface
       double turboPower = 1.0-Joystick.getRawAxis(2)+0.1;
       double slowPower  = 3.0;
   
-      if ( UI.speakerTarget() || UI.speakerShoot() )
+      if ( !UI.speakerTarget() && UI.speakerShoot() )
       {
          robot.driveBase.driveFacing( x, y, robot.landmarks.speaker );
       }
@@ -107,83 +108,22 @@ public class Teleop implements OpModeInterface
       {
          robot.driveBase.drive( x, y, hx );//x, hy );
       }
-      // if (Buttons1.getRawButtonPressed(2)) // Travel
-      // {
-      //    robot.shooter.setState(MANIP_STATE.STOW, 0.0);
-      // }
-      // if (Joystick.getRawAxis(3) <= 0.25)
-      // {
-      //    robot.shooter.setState(MANIP_STATE.STOW, 0.0);
-      // }
-      // else if (Joystick.getRawAxis(3) > 0.25) // Intake
-      // {
-      //    robot.shooter.setState( MANIP_STATE.INTAKE, 0.0 );
-      // }
-      // if (Buttons1.getRawButtonPressed(3)) // Shoot
-      // {
-      //    robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, robot.target_distance );
-      // }
-      // else if (Joystick.getRawButtonPressed(1))
-      // {
-      //    robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, robot.target_distance );
-      // }
-      // else if (!Buttons1.getRawButton(4)) // Limelight Off
-      // {
-      //    if (Buttons1.getRawButton(5)) // Rotate Up
-      //    {
-      //       robot.shooter.manualAngle(-0.45);
-      //    }
-      //    else if (Buttons1.getRawButton(6)) // Rotate Down
-      //    {
-      //       robot.shooter.manualAngle(1.2);
-      //    }
-      //    else
-      //    {
-      //       robot.shooter.manualAngle(0.0);
-      //    }
-      // }
-      // else if (Buttons2.getRawButtonPressed(4)) // Amp
-      // {
-      //    robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
-      // }
-      // if ( Buttons1.getRawButton(4)) // Limelight On
-      // {
-      //    robot.setManual( false );
-      // }
-      // else
-      // {
-      //    robot.setManual( true );
-      // }
-      // if (Buttons1.getRawButton(11)) // Left Climb Up
-      // {
-      //    robot.climber.leftExtend();
-      // }
-      // else if (Buttons1.getRawButton(7)) // Left Climb Down
-      // {
-      //    robot.climber.leftRetract();
-      // }
-      // else
-      // {
-      //    robot.climber.leftStop();
-      // }
-      // if (Buttons2.getRawButton(6)) // Right Climb Up
-      // {
-      //    robot.climber.rightExtend();
-      // }
-      // else if (Buttons2.getRawButton(5)) // Right Climb Down
-      // {
-      //    robot.climber.rightRetract();
-      // }
-      // else
-      // {
-      //    robot.climber.rightStop();
-      // }
 
+      if( UI.stowActive() ) // Stow
+      {
+         robot.shooter.setState( MANIP_STATE.STOW, 0.0 );
+      }
       if( UI.intakeActive() ) // Intake
       {
          robot.shooter.setState( MANIP_STATE.INTAKE, 0.0 );
+         wasIntaking = true;
       }
-      else if( UI.speakerShoot() ) // Speaker Shoot
+      else if ( wasIntaking )
+      {
+         robot.shooter.setState( MANIP_STATE.STOW, 0.0 );
+         wasIntaking = false;
+      }
+      if( UI.speakerShoot() ) // Speaker Shoot
       {
          robot.shooter.setState( MANIP_STATE.SPEAKER_SHOOT, robot.target_distance );
       }
@@ -191,21 +131,13 @@ public class Teleop implements OpModeInterface
       {
          robot.shooter.setState( MANIP_STATE.SPEAKER_TARGET, robot.target_distance );
       }
-      else if ( UI.ampTarget() ) // Amp
-      {
-         robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
-      }
-      else if ( UI.ampShoot() )
+      if ( UI.ampShoot() )
       {
          robot.shooter.setState( MANIP_STATE.AMPLIFIER_SHOOT, 0.0 );
       }
-      else if( UI.stowActive() ) // Stow
+      else if ( UI.ampTarget() ) // Amp
       {
-         robot.shooter.setState( MANIP_STATE.STOW, 0.0);
-      }
-      else
-      {
-         robot.shooter.setState( MANIP_STATE.STOW,  0.0 );
+         robot.shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, 0.0 );
       }
       
       // Left Climber
@@ -241,15 +173,15 @@ public class Teleop implements OpModeInterface
       // Manual Angle Control
       if( UI.manualRotUp() ) // Rotation Up
       {
-         robot.shooter.manualAngle(-0.45);
+         robot.shooter._shooter.manualAngle(-0.45);
       }
       else if( UI.manualRotDown() ) // Rotation Down
       {
-         robot.shooter.manualAngle(1.2);
+         robot.shooter._shooter.manualAngle(1.2);
       }
       else
       {
-         robot.shooter.manualAngle(0.0);
+         robot.shooter._shooter.manualAngle(0.0);
       }
 
       // Limelight
@@ -262,15 +194,15 @@ public class Teleop implements OpModeInterface
          robot.setManual( true );
          if( UI.manualRotUp() ) // Rotation Up
          {
-            robot.shooter.manualAngle(-0.45);
+            robot.shooter._shooter.manualAngle(-0.45);
          }
          else if( UI.manualRotDown() ) // Rotation Down
          {
-            robot.shooter.manualAngle(1.2);
+            robot.shooter._shooter.manualAngle(1.2);
          }
          else
          {
-            robot.shooter.manualAngle(0.0);
+            robot.shooter._shooter.manualAngle(0.0);
          }
       }
       

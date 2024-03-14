@@ -4,17 +4,19 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Manipulator
 {
-   private Shooter  _shooter;
+   private boolean elbowExtended = false;
+   public Shooter  _shooter;
    private DoubleSolenoid _extension0 = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 0, 1 );
    private DoubleSolenoid _elbow0     = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 2, 3 );
    private DoubleSolenoid _elbow1     = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 4, 5 );
+   private Timer intake_timer = new Timer();
 
    public static enum MANIP_STATE
    {
@@ -42,8 +44,24 @@ public class Manipulator
       elbowDown();
    }
 
-   public void setState( MANIP_STATE new_state )
+   public void setState( MANIP_STATE new_state, double distance )
    {
+      if ( manip_state != new_state )
+      {
+         switch( new_state )
+         {
+            case DISABLE:
+               disable();
+               break;
+            case STOW:
+            case INTAKE:
+            case AMPLIFIER_TARGET:
+            case AMPLIFIER_SHOOT:
+               intake_timer.reset();
+               intake_timer.start();
+               break;
+         }
+      }
       manip_state = new_state;
    }
 
@@ -56,94 +74,110 @@ public class Manipulator
             break;
          case STOW:
             _shooter.setState( manip_state, distance );
-            if ( _shooter.atPosition( ) )
+            //if ( _shooter.atPosition( ) )
+            //{
+            if ( intake_timer.get() > 1.5 )
             {
                retract();
             }
-            elbowDown();
+            //}
+            if ( intake_timer.get() > 3.0 )
+            {
+               elbowDown();
+            }
             break;
          case INTAKE:
             if ( _shooter.haveNote( ) )
             {
                _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
-               retract();
+               if ( intake_timer.get() > 1.5 )
+               {
+                  retract();
+               }
             }
             else
             {
-               _shooter.setState( manip_state, distance ); // does this need a delay?
+               if ( intake_timer.get() > 1.5 )
+               {
+                  _shooter.setState( manip_state, distance ); // does this need a delay?
+               }
                extend();
             }
             elbowDown();
             break;
          case AMPLIFIER_TARGET:
-            _shooter.setState( manip_state, distance ); // does this need a delay?
-            extend();         // does this need to be true to reach the amp?
             elbowUp();
+            if ( intake_timer.get() > 2.5 )
+            {
+               extend();         // does this need to be true to reach the amp?
+               _shooter.setState( manip_state, distance ); // does this need a delay?
+            }
             break;
          case AMPLIFIER_SHOOT:
             if ( _shooter.haveNote( ) )
             {
-               if ( _shooter.ready( ) )
-               {
+               // if ( _shooter.ready( ) )
+               // {
+                  System.out.println("ManipAmpShoot");
                   _shooter.setState( manip_state, distance );
-               }
-               else
-               {
-                  _shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, distance );
-               }
-               extend();         // does this need to be true to reach the amp?
-               elbowUp();
+               // }
+               // else
+               // {
+               //    _shooter.setState( MANIP_STATE.AMPLIFIER_TARGET, distance );
+               // }
             }
             else
             {
-               _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
-               retract();         // does this need to be true to reach the amp?
-               elbowDown();
+               setState( MANIP_STATE.STOW, distance ); // does this need a delay?
+               //retract();         // does this need to be true to reach the amp?
+               //elbowDown();
             }
             break;
          case SPEAKER_TARGET:
-            _shooter.setState( manip_state, 0.0 ); // does this need a delay?
+            _shooter.setState( manip_state, distance ); // does this need a delay?
             retract();
             elbowDown();
             break;
          case SPEAKER_SHOOT:
             if ( _shooter.haveNote( ) )
             {
-               if ( _shooter.ready( ) )
-               {
-                  _shooter.setState( manip_state, 0.0 );
-               }
-               else
-               {
-                  _shooter.setState( MANIP_STATE.SPEAKER_TARGET, distance );
-               }
+               //if ( _shooter.ready( ) )
+               //{
+                  _shooter.setState( manip_state, distance );
+               //}
+               //else
+               //{
+               //   _shooter.setState( MANIP_STATE.SPEAKER_TARGET, distance );
+               //}
             }
             else
             {
-               _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
+               setState( MANIP_STATE.STOW, distance ); // does this need a delay?
             }
-            retract ();
-            elbowDown();
+            //retract ();
+            //elbowDown();
             break;
       }
       _shooter.periodic( distance );
    }
    public void extend()
    {
-      _extension0.set( Value.kReverse );
+      _extension0.set( Value.kForward );
    }
    public void retract()
    {
-      _extension0.set( Value.kForward );
+      _extension0.set( Value.kReverse );
    }
    public void elbowUp()
    {
-      _elbow0.set( Value.kReverse );
+      elbowExtended = true;
+      _elbow0.set( Value.kForward );
       _elbow1.set( Value.kForward );
    }
    public void elbowDown()
    {
-      _elbow0.set( Value.kForward );
+      elbowExtended = false;
+      _elbow0.set( Value.kReverse );
       _elbow1.set( Value.kReverse );
    }
    public boolean atPosition()

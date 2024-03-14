@@ -47,12 +47,11 @@ public class Auton1NearCenter implements OpModeInterface
                 }
                 break;
             case 1:
-                if (autonTimer.get() > 0.3)
+                if (autonTimer.get() > 2.0)
                 {
                     autonTimer.stop();
                     autonTimer.reset();
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    autonTimer.start();
                     step++;
                 }
                 break;
