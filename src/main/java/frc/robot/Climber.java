@@ -1,9 +1,11 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Manipulator.MANIP_STATE;
 
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -15,6 +17,8 @@ public class Climber {
     
     private final CANSparkMax _leftClimber;
     private final CANSparkMax _rightClimber;
+    private RelativeEncoder l_enc;
+    private RelativeEncoder r_enc;
 
     public Climber()
     {
@@ -26,6 +30,7 @@ public class Climber {
         _leftClimber.enableSoftLimit(SoftLimitDirection.kForward, false);
         _leftClimber.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
         _leftClimber.setIdleMode(IdleMode.kBrake);
+        l_enc = _leftClimber.getEncoder( );
 
         _rightClimber = new CANSparkMax(51, MotorType.kBrushless);
         _rightClimber.setSmartCurrentLimit(40);
@@ -35,7 +40,8 @@ public class Climber {
         _rightClimber.enableSoftLimit(SoftLimitDirection.kForward, false);
         _rightClimber.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
         _rightClimber.setIdleMode(IdleMode.kBrake);
-
+        r_enc = _rightClimber.getEncoder( );
+        
     }
     
    public void disable( ) 
@@ -46,27 +52,42 @@ public class Climber {
 
    public void periodic()
    {
-
+      SmartDashboard.putNumber("climber/left", l_enc.getPosition());
+      SmartDashboard.putNumber("climber/right", r_enc.getPosition());
    }
 
     public void leftExtend( )
     {
-        _leftClimber.set(0.25);
+        _leftClimber.set(1.0);
     }
 
     public void rightExtend( )
     {
-        _rightClimber.set(0.25);
+        _rightClimber.set(1.0);
     }
 
     public void leftRetract( )
     {
-        _leftClimber.set(-0.25);
+        if ( l_enc.getPosition() > 1.0)
+        {
+            _leftClimber.set(-1.0);
+        }
+        else
+        {
+            _leftClimber.set(0.0);
+        }
     }
 
     public void rightRetract( )
     {
-        _rightClimber.set(-0.25);
+        if ( r_enc.getPosition() > 1.0)
+        {
+            _rightClimber.set(-1.0);
+        }
+        else
+        {
+            _rightClimber.set(0.0);
+        }
     }
 
     public void leftStop( )

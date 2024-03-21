@@ -37,8 +37,8 @@ public class DriveBase
       {
          swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(),"swerve")).createSwerveDrive(maximumSpeed);
          swerveController = swerveDrive.swerveController;
-         swerveController.thetaController.setTolerance( Math.PI/90.0 );
-         swerveController.thetaController.setPID(1.0, 0.0, 0.02);
+         swerveController.thetaController.setTolerance( Math.PI/90.0, 0.1 );
+         swerveController.thetaController.setPID(0.8, 0.0, 0.02);
       }
       catch (Exception e)
       {

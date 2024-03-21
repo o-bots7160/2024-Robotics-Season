@@ -316,6 +316,11 @@ public class Shooter
       return ( angleAtPosition( ) && topShooterAtVelocity( ) );
    }
 
+   public void spitNote()
+   {
+      intakeSetVelocity(-80.0);
+   }
+
    public boolean haveNote( )
    {
       boolean return_value = false;
@@ -352,7 +357,7 @@ public class Shooter
    private boolean angleAtPosition()
    {
       double error = angle_target - en_angle.getAbsolutePosition();
-      if ( ( error < 3.0 ) && ( error > -3.0 ) ) // What should these be?
+      if ( ( error > 2.0 ) && ( error < 4.0 ) ) // What should these be?
       {
          return true;
       }
@@ -432,7 +437,7 @@ public class Shooter
       // }
       // else
       // {
-         return false;
+         return true;
       // }
    }
 

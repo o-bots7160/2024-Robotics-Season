@@ -26,7 +26,8 @@ public class Manipulator
       AMPLIFIER_TARGET,
       AMPLIFIER_SHOOT,
       SPEAKER_TARGET,
-      SPEAKER_SHOOT
+      SPEAKER_SHOOT,
+      CLIMBING
    };
 
    private MANIP_STATE manip_state = MANIP_STATE.STOW;
@@ -60,6 +61,8 @@ public class Manipulator
                intake_timer.reset();
                intake_timer.start();
                break;
+            case CLIMBING:
+               break;
          }
       }
       manip_state = new_state;
@@ -76,12 +79,12 @@ public class Manipulator
             _shooter.setState( manip_state, distance );
             //if ( _shooter.atPosition( ) )
             //{
-            if ( intake_timer.get() > 1.5 )
+            if ( intake_timer.get() > 1.0 )
             {
                retract();
             }
             //}
-            if ( intake_timer.get() > 3.0 )
+            if ( intake_timer.get() > 1.75 )
             {
                elbowDown();
             }
@@ -157,6 +160,9 @@ public class Manipulator
             //retract ();
             //elbowDown();
             break;
+            case CLIMBING:
+               elbowUp();
+               break;
       }
       _shooter.periodic( distance );
    }

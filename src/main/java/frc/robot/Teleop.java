@@ -22,14 +22,15 @@ public class Teleop implements OpModeInterface
    public void Init()
    {
       // zero gyro? maybe not... only in Robot.init?
+      robot.shooter.setState(MANIP_STATE.STOW, 0.0);
       robot.setManual( false );
    }
    public void Periodic()
    {
       x  = Joystick.getRawAxis(5);
-      x  = robot.landmarks.joystickInversion * Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
+      x  = robot.landmarks.joystickInversion * Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/2.0;
       y  = Joystick.getRawAxis(4);
-      y  = robot.landmarks.joystickInversion * Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/4.0;
+      y  = robot.landmarks.joystickInversion * Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/2.0;
       hx = -Joystick.getRawAxis(0);
       hx = Math.pow( hx, 3.0 ) * robot.driveBase.getMaximumVelocity();
       hy = -Joystick.getRawAxis(1);
@@ -43,7 +44,7 @@ public class Teleop implements OpModeInterface
       }
       else if ( Joystick.getPOV() == 270 )
       {
-         robot.driveBase.driveHeading( x, y, Math.PI/2.0 );
+         robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
       }
       else if ( Joystick.getPOV() == 0 )
       {
@@ -51,15 +52,33 @@ public class Teleop implements OpModeInterface
       }
       else if ( Joystick.getPOV() == 90 )
       {
-         robot.driveBase.driveHeading( x, y, -Math.PI/2.0 );
+         robot.driveBase.driveHeading( x, y, Math.PI/2.0 );
       }
       else if ( Joystick.getPOV() == 180 )
       {
          robot.driveBase.driveFacing( x, y, robot.landmarks.speaker );
       }
-      else if( Joystick.getRawButton(7))
+      else if ( UI.lockActive() )
       {
-         switch(robot.id)
+         robot.driveBase.stopDrive();
+      }
+      else if ( Joystick.getRawAxis(2) > 0.1 )
+      {
+         robot.driveBase.drive( x/turboPower, y/turboPower, hx*8 );
+      }
+      else if ( Joystick.getRawButton(5))
+      {
+         robot.driveBase.drive( x/slowPower, y/slowPower, hx/slowPower);
+      }
+      else
+      {
+         robot.driveBase.drive( x, y, hx );//x, hy );
+      }
+
+      if( Joystick.getRawButton(7))
+      {
+         robot.shooter._shooter.spitNote();
+         /*switch(robot.id)
          {
             case 11:
             stageAngle = Math.toRadians(300.0);
@@ -90,26 +109,9 @@ public class Teleop implements OpModeInterface
             break;
 
          }
-         robot.driveBase.driveHeading( x, y, stageAngle );
+         robot.driveBase.driveHeading( x, y, stageAngle ); */
       }
-      else if ( UI.lockActive() )
-      {
-         robot.driveBase.stopDrive();
-      }
-      else if ( Joystick.getRawAxis(2) > 0.1 )
-      {
-         robot.driveBase.drive( x/turboPower, y/turboPower, hx*8 );
-      }
-      else if ( Joystick.getRawButton(5))
-      {
-         robot.driveBase.drive( x/slowPower, y/slowPower, hx/slowPower);
-      }
-      else
-      {
-         robot.driveBase.drive( x, y, hx );//x, hy );
-      }
-
-      if( UI.stowActive() ) // Stow
+      else if( UI.stowActive() ) // Stow
       {
          robot.shooter.setState( MANIP_STATE.STOW, 0.0 );
       }
@@ -154,7 +156,6 @@ public class Teleop implements OpModeInterface
          robot.climber.leftStop();
       }
 
-
       // Right Climber
       if( UI.rightClimbExtend() ) // Right Climb Extend
       {
@@ -169,6 +170,11 @@ public class Teleop implements OpModeInterface
          robot.climber.rightStop();
       }
 
+      //Rotation For Climbing
+      if( UI.rightClimbExtend() && UI.leftClimbExtend() )
+      {
+         robot.shooter.setState(MANIP_STATE.CLIMBING, 0.0);
+      }
 
       // Manual Angle Control
       if( UI.manualRotUp() ) // Rotation Up

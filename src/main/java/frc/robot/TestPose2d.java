@@ -36,6 +36,9 @@ public class TestPose2d implements OpModeInterface {
       SmartDashboard.putNumber("TestX", control_pose.getX( ) );
       SmartDashboard.putNumber("TestY", control_pose.getY( ) );
       SmartDashboard.putNumber("TestZ", control_pose.getRotation( ).getDegrees( ) );
+      SmartDashboard.putNumber("ErrorX", control_pose.getX( ) - robot.driveBase.getPose().getX( ));
+      SmartDashboard.putNumber("ErrorY", control_pose.getY() - robot.driveBase.getPose( ).getY( ));
+      SmartDashboard.putNumber("ErrorRot", control_pose.getRotation().getDegrees() - robot.driveBase.getPose().getRotation().getDegrees());
       if ( Joystick.getRawButtonPressed(1) )
       {
          System.out.println( "Got A button");
@@ -95,6 +98,6 @@ public class TestPose2d implements OpModeInterface {
          control_pose = robot.driveBase.getPose();
          moving = false;
       }
-      System.out.println("moving: " + moving);
+      //System.out.println("moving: " + moving);
    }
 }

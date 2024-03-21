@@ -1,7 +1,6 @@
 package frc.robot.AutonModes;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.OpModeInterface;
 import frc.robot.RobotContainer;
@@ -12,8 +11,8 @@ public class Auton1NearCenter implements OpModeInterface
 
     private RobotContainer robot;
 
-    public Pose2d initPose = new Pose2d();
-    public Pose2d nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0));
+    //public Pose2d initPose;
+    public Pose2d nextPose;
     public Timer autonTimer = new Timer();
     private int step = 0;
     // public Translation2d blueSpeaker = new Translation2d( 0.5,  5.55 );
@@ -28,8 +27,10 @@ public class Auton1NearCenter implements OpModeInterface
     public void Init()
     {
         step = 0;
-        initPose = robot.driveBase.getPose();
+        //initPose = robot.driveBase.getPose();
         robot.setManual( false );
+        //initPose = new Pose2d();
+        nextPose = robot.landmarks.backPose;
     }
 
     @Override
@@ -42,15 +43,15 @@ public class Auton1NearCenter implements OpModeInterface
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, 0.0);
-                    autonTimer.start();
+                    // autonTimer.start();
                     step++;
                 }
                 break;
             case 1:
-                if (autonTimer.get() > 2.0)
+                if (robot.shooter._shooter.ready()) //autonTimer.get > 2.0
                 {
-                    autonTimer.stop();
-                    autonTimer.reset();
+                    // autonTimer.stop();
+                    // autonTimer.reset();
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
                     step++;
                 }

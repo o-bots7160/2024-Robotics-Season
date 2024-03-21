@@ -58,7 +58,7 @@ public class UI
 
     public boolean ampShoot()
     {
-        if (Joystick.getRawButton(6) && amp_target && !speaker_target)
+        if (Joystick.getRawButton(6) && amp_target)
         {
             amp_shoot = true;
         }
@@ -103,6 +103,15 @@ public class UI
 
     public boolean leftClimbExtend()
     {
+        stow_active = false;
+        if (Buttons1.getRawButton(11))
+        {
+            intake_active = false;
+            speaker_shoot = false;
+            speaker_target = false;
+            amp_shoot = false;
+            amp_target = false;
+        }
         return Buttons1.getRawButton(11);
     }
 
@@ -113,6 +122,15 @@ public class UI
 
     public boolean rightClimbExtend()
     {
+        stow_active = false;
+        if (Buttons2.getRawButton(6))
+        {
+            intake_active = false;
+            speaker_shoot = false;
+            speaker_target = false;
+            amp_shoot = false;
+            amp_target = false;
+        }
         return Buttons2.getRawButton(6);
     }
 

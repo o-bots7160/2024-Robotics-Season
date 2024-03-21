@@ -12,8 +12,8 @@ public class Auton4FarSource implements OpModeInterface
 
     private RobotContainer robot;
 
-    public Pose2d initPose = new Pose2d();
-    public Pose2d nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0));
+    //public Pose2d initPose;
+    public Pose2d nextPose;
     public Timer autonTimer = new Timer();
     private int step = 0;
 
@@ -26,8 +26,10 @@ public class Auton4FarSource implements OpModeInterface
     public void Init()
     {
         step = 0;
-        initPose = robot.driveBase.getPose();
+        //initPose = robot.driveBase.getPose();
         robot.setManual( false );
+        //initPose = new Pose2d();
+        nextPose = robot.landmarks.farRight;
     }
 
     @Override
@@ -68,7 +70,7 @@ public class Auton4FarSource implements OpModeInterface
                     autonTimer.stop();
                     robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
-                    nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0)); //FIXME
+                    nextPose = robot.landmarks.sourceShoot; //FIXME
                     step++;
                 }
                 break;
@@ -93,7 +95,7 @@ public class Auton4FarSource implements OpModeInterface
                     autonTimer.stop();
                     robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
-                    nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0)); //FIXME
+                    nextPose = robot.landmarks.farRightCenter; //FIXME
                     step++;
                 }
                 break;
@@ -111,7 +113,7 @@ public class Auton4FarSource implements OpModeInterface
                     autonTimer.stop();
                     robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
-                    nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0)); //FIXME
+                    nextPose = robot.landmarks.sourceShoot; //FIXME
                     step++;
                 }
                 break;
@@ -136,7 +138,7 @@ public class Auton4FarSource implements OpModeInterface
                     autonTimer.stop();
                     robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
-                    nextPose = new Pose2d(6.1, 7.0, new Rotation2d(0.0)); //FIXME
+                    nextPose = robot.landmarks.farCenter; //FIXME
                     step++;
                 }
                 break;
@@ -154,7 +156,7 @@ public class Auton4FarSource implements OpModeInterface
                     autonTimer.stop();
                     robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                     autonTimer.reset();
-                    nextPose = new Pose2d(4.0, 7.0, new Rotation2d(0.0)); //FIXME
+                    nextPose = robot.landmarks.sourceShoot; //FIXME
                     step++;
                 }
                 break;

@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Pose2dFilter
 {
-   final private int maxSamples = 50;
+   final private int    maxSamples = 25;
+   final private double maxAge     =  3.0; // seconds
+   final private double minPeriod  =  0.5; // seconds
+   final private long    minSamples = (long)( (double)maxSamples / 4.0 );
 
    class AverageBuffer extends DoubleCircularBuffer
    {
@@ -84,7 +87,8 @@ public class Pose2dFilter
 
    private AverageBuffer buffX  = new AverageBuffer( maxSamples     );
    private AverageBuffer buffY  = new AverageBuffer( maxSamples     );
-   private AverageBuffer buffR  = new AverageBuffer( maxSamples     );
+   private AverageBuffer buffRx = new AverageBuffer( maxSamples     );
+   private AverageBuffer buffRy = new AverageBuffer( maxSamples     );
    private AverageBuffer buffT  = new AverageBuffer( maxSamples     );
    private AverageBuffer buffTd = new AverageBuffer( maxSamples - 1 );
 
@@ -113,10 +117,11 @@ public class Pose2dFilter
    //
    public void reset()
    {
-      buffX.clear();
-      buffY.clear();
-      buffR.clear();
-      buffT.clear();
+      buffX .clear();
+      buffY .clear();
+      buffRx.clear();
+      buffRy.clear();
+      buffT .clear();
       buffTd.clear();
       avgPose    = new Pose2d();
       avgTime    = 0.0;
@@ -136,21 +141,24 @@ public class Pose2dFilter
    //
    public boolean addData( Pose2d newSample, double timestamp )
    {
+      double  rotation = newSample.getRotation().getRadians();
       //
-      // Clean out data older that 3 seconds??? Is this too long? Too short?
+      // Clean out data older that maxAge seconds??? Is this too long? Too short?
       //
       //
-      while ( buffT.size() > 0 && ( timestamp - buffT.getFirst() ) > 3.0 )
+      while ( buffT.size() > 0 && ( timestamp - buffT.getFirst() ) > maxAge )
       {
-         buffX.removeFirst();
-         buffY.removeFirst();
-         buffR.removeFirst();
-         buffT.removeFirst();
+         buffX .removeFirst();
+         buffY .removeFirst();
+         buffRx.removeFirst();
+         buffRy.removeFirst();
+         buffT .removeFirst();
          buffTd.removeFirst();
       }
       avgPose   = new Pose2d( buffX.average( newSample.getX() ),
                               buffY.average( newSample.getY() ),
-                              new Rotation2d( buffR.average( newSample.getRotation().getRadians() ) ) );
+                              // Clever solution I hadn't seen before. See wikipedia article entitle "Circular Mean"
+                              new Rotation2d( Math.atan2( buffRx.average( Math.sin( rotation ) ), buffRy.average( Math.cos( rotation ) ) ) ) );
       avgPeriod = buffTd.average( timestamp - buffT.getLast() );
       avgTime   = buffT.average(  timestamp );
 
@@ -162,6 +170,7 @@ public class Pose2dFilter
          SmartDashboard.putNumber( "Pose2dFilter/Y",       avgPose.getY( ) );
          SmartDashboard.putNumber( "Pose2dFilter/Heading", avgPose.getRotation( ).getDegrees( ) );
       }
-      return ( buffX.size() > (long)( maxSamples / 4.0 ) && ( avgPeriod < 0.5 ) );
+      
+      return ( buffX.size() > minSamples && ( avgPeriod < minPeriod ) );
    }
 }

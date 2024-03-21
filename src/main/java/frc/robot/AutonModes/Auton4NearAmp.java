@@ -1,9 +1,6 @@
 package frc.robot.AutonModes;
 
-import com.revrobotics.ColorSensorV3.MainControl;
-
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.OpModeInterface;
 import frc.robot.RobotContainer;
@@ -14,8 +11,8 @@ public class Auton4NearAmp implements OpModeInterface
 
     private RobotContainer robot;
 
-    public Pose2d initPose = new Pose2d();
-    public Pose2d nextPose = new Pose2d(3.0, 7.1, new Rotation2d(0.0));
+    //public Pose2d initPose;
+    public Pose2d nextPose;
     public Timer autonTimer = new Timer();
     private int step = 0;
 
@@ -28,8 +25,10 @@ public class Auton4NearAmp implements OpModeInterface
     public void Init()
     {
         step = 0;
-        initPose = robot.driveBase.getPose();
+        //initPose = robot.driveBase.getPose();
         robot.setManual( false );
+        //initPose = new Pose2d();
+        nextPose = robot.landmarks.nearLeft;
     }
 
     @Override
@@ -41,20 +40,17 @@ public class Auton4NearAmp implements OpModeInterface
             case 0:
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
-                    robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, 0.0);
-                    autonTimer.start();
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
                     step++;
                 }
                 break;
             case 1:
-                if (autonTimer.get() > 0.3)
+                if (robot.shooter._shooter.ready())
                 {
-                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    if (autonTimer.get() > 0.6)
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
+                    if (!robot.shooter._shooter.haveNote())
                     {
                         robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
-                        autonTimer.stop();
-                        autonTimer.reset();
                         step++;
                     }
                 }
@@ -69,20 +65,21 @@ public class Auton4NearAmp implements OpModeInterface
             case 3:
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
-                    autonTimer.start();
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
                     step++;
                 }
                 break;
             case 4:
-                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    if (autonTimer.get() > 0.5)
+                if (robot.shooter._shooter.ready())
+                {
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
+                    if (!robot.shooter._shooter.haveNote())
                     {
                         robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
-                        autonTimer.stop();
-                        autonTimer.reset();
-                        nextPose = new Pose2d(3.3, 6.0, new Rotation2d(-Math.PI/2));
+                        nextPose = robot.landmarks.nearCenter;
                         step++;
                     }
+                }
                 break;
             case 5:
                 if (!robot.driveBase.move_Pose2d(nextPose))
@@ -94,20 +91,21 @@ public class Auton4NearAmp implements OpModeInterface
             case 6:
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
-                    autonTimer.start();
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
                     step++;
                 }
                 break;
             case 7:
-                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    if (autonTimer.get() > 0.5)
+                if (robot.shooter._shooter.ready())
+                {
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
+                    if (!robot.shooter._shooter.haveNote())
                     {
                         robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
-                        autonTimer.stop();
-                        autonTimer.reset();
-                        nextPose = new Pose2d(2.4, 4.2, new Rotation2d(-Math.PI/4));
+                        nextPose = robot.landmarks.nearRight;
                         step++;
                     }
+                }
                 break;
             case 8:
                 if (!robot.driveBase.move_Pose2d(nextPose))
@@ -119,30 +117,22 @@ public class Auton4NearAmp implements OpModeInterface
             case 9:
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
-                    autonTimer.start();
-                    autonTimer.start();
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
                     step++;
                 }
                 break;
             case 10:
-                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    if (autonTimer.get() > 0.5)
+                if (robot.shooter._shooter.ready())
+                {
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
+                    if (!robot.shooter._shooter.haveNote())
                     {
-                        autonTimer.stop();
-                        autonTimer.reset();
-                        nextPose = new Pose2d(2.5, 5.5, new Rotation2d(0.0));
+                        nextPose = robot.landmarks.backPose;
                         step++;
                     }
-                break;
-            case 11:
-                if (!robot.driveBase.move_Pose2d(nextPose))
-                {
-                    robot.driveBase.stopDrive();
-                    nextPose = new Pose2d(4.0, 5.5, new Rotation2d(0.0));
-                    step++;
                 }
                 break;
-            case 12:
+            case 11:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     robot.driveBase.stopDrive();

@@ -1,6 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.AutonModes.Auton1NearCenter;
@@ -17,6 +19,7 @@ public class Robot extends TimedRobot
    private RobotContainer  robot;
 
    private final SendableChooser<OpModeInterface> m_chooser = new SendableChooser<>();
+   private final SendableChooser<Alliance> m_alliance = new SendableChooser<>();
 
    @Override
    public void robotInit() 
@@ -28,6 +31,11 @@ public class Robot extends TimedRobot
       m_chooser.addOption("Auton4FarSource", new Auton4FarSource());
       m_chooser.addOption("Auton3NearAmp", new Auton3NearAmp());
       SmartDashboard.putData("Auto choices", m_chooser);
+      m_alliance.setDefaultOption("Blue", Alliance.Blue);
+      m_alliance.addOption("Red", Alliance.Red);
+      SmartDashboard.putData("Alliance", m_alliance);
+
+      CameraServer.startAutomaticCapture();
    }
 
    @Override
@@ -40,7 +48,7 @@ public class Robot extends TimedRobot
    @Override
    public void autonomousInit()
    {
-      robot.opmodeInit();
+      robot.opmodeInit( m_alliance.getSelected());
       auton = m_chooser.getSelected();
       //System.out.println("Auto selected: " + auton.toString());
 
@@ -57,21 +65,24 @@ public class Robot extends TimedRobot
    @Override
    public void teleopInit()
    {
-      robot.opmodeInit();
+      robot.opmodeInit( m_alliance.getSelected() );
       teleop = new Teleop();
       teleop.Init();
+      robot.leds.init();
    }
 
    @Override
    public void teleopPeriodic()
    {
       teleop.Periodic();
+      robot.leds.periodic();
    }
 
    @Override
    public void disabledInit()
    {
       robot.disable();
+      robot.leds.disable();
    } 
 
    @Override
@@ -82,14 +93,16 @@ public class Robot extends TimedRobot
 
    public void testInit()
   {
-    robot.opmodeInit();
+    robot.opmodeInit( m_alliance.getSelected() );
     test = new TestPose2d();
     test.Init();
+    robot.leds.init();
   }
 
   @Override
   public void testPeriodic()
   {
     test.Periodic();
+    robot.leds.periodic();
   }
 }
