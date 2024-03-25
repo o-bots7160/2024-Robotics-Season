@@ -9,7 +9,7 @@ public class AllianceLandmarks
 {
     private double        blueJoystickInversion = -1.0;
     private Translation2d blueSpeaker   = new Translation2d( 0.55,  5.55 );
-    private Pose2d blueNearLeft         = new Pose2d( 2.5, 7.0,  new Rotation2d(0.0) );
+    private Pose2d blueNearLeft         = new Pose2d( 2.5, 7.6,  new Rotation2d(0.0) );
     private Pose2d blueNearCenter       = new Pose2d( 2.5, 5.5,  new Rotation2d(0.0) );
     private Pose2d blueNearRight        = new Pose2d( 2.5, 4.25, new Rotation2d(0.0) );
 
@@ -24,7 +24,7 @@ public class AllianceLandmarks
 
     private double        redJoystickInversion = 1.0;
     private Translation2d redSpeaker    = new Translation2d( 16.529342, 5.55 );
-    private Pose2d redNearLeft          = new Pose2d( 14.579342, 7.0, new Rotation2d( Math.toRadians( 180.0 ) ) );
+    private Pose2d redNearLeft          = new Pose2d( 14.579342, 7.6, new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redNearCenter        = new Pose2d( 14.579342, 5.5,  new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redNearRight         = new Pose2d( 14.579342, 4.25,  new Rotation2d( Math.toRadians( 180.0 ) ) );
 

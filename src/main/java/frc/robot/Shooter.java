@@ -33,9 +33,9 @@ public class Shooter
    private PIDController pid_angle = new PIDController(6.65000, 0.0, 0.0);
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
-   final double travel_angle = Math.toRadians(290.0);
-   final double intake_angle = Math.toRadians(340.0);
-   final double amp_angle    = Math.toRadians(320.0);
+   final double travel_angle = Math.toRadians(344.0); // Highest           287.0
+   final double intake_angle = Math.toRadians(45.0); // Lowest            337.0
+   final double amp_angle    = Math.toRadians(25.0); // Intake - 20       317.0
    private RelativeEncoder angleEncoder;
 
    private TalonFX _intake;
@@ -198,6 +198,8 @@ public class Shooter
                calculateAngleAndSpeedFrom( distance );
                angleSetPosition( angle_target );
                shooterSetVelocity(topShooter_target);
+               shootTimer.reset();
+               shootTimer.start();
             }
             else
             {
@@ -224,11 +226,13 @@ public class Shooter
    public void periodic( double distance )
    {
       double angleRadians = en_angle.getAbsolutePosition() * 2.0 * Math.PI;
+      double armVolts     = Math.cos( angle_target - travel_angle ) * -0.00;
       SmartDashboard.putNumber("shooter/angle position", Math.toDegrees( angleRadians ));
-      SmartDashboard.putNumber("shooter/angle target", Math.toDegrees( pid_angle.getSetpoint() ));
+      SmartDashboard.putNumber("shooter/angle target", Math.toDegrees( angle_target ));
       SmartDashboard.putNumber("shooter/TOF", sensor.getRange() );
       SmartDashboard.putBoolean("shooter/manual", manual.getAsBoolean() );
       SmartDashboard.putNumber("shooter/encoder", angleEncoder.getPosition() );
+      SmartDashboard.putNumber("shooter/armVolts", armVolts );
       switch( state )
       {
          case DISABLE:
@@ -301,7 +305,7 @@ public class Shooter
       }
       else
       {
-        _angle.setVoltage( pid_angle.calculate( angleRadians ) + Math.cos( angle_target - travel_angle ) * -0.45 );
+        _angle.setVoltage( pid_angle.calculate( angleRadians ) + armVolts );
       }
       shooterSetVelocity(topShooter_target);
    }
@@ -356,8 +360,8 @@ public class Shooter
 
    private boolean angleAtPosition()
    {
-      double error = angle_target - en_angle.getAbsolutePosition();
-      if ( ( error > 2.0 ) && ( error < 4.0 ) ) // What should these be?
+      //double error = angle_target - en_angle.getAbsolutePosition();
+      if ( pid_angle.atSetpoint() ) // What should these be?
       {
          return true;
       }
@@ -431,14 +435,14 @@ public class Shooter
    private boolean topShooterAtVelocity()
    {
       // double error = topShooter_target - en_topShoot.getVelocity();
-      // if ( ( error < 3.0 ) && ( error > -3.0 ) ) // What should these be?
-      // {
-      //    return true;
-      // }
-      // else
-      // {
+      if ( shootTimer.get() > 1.0 ) // What should these be?
+      {
          return true;
-      // }
+      }
+      else
+      {
+         return true;
+      }
    }
 
    public void shooterSetVelocity( double new_target)
@@ -459,8 +463,8 @@ public class Shooter
    private void calculateAngleAndSpeedFrom( double distance )
    {
       double min_distance = 1.2446;
-      double max_distance = 2.7;
-      double max_angle    = Math.toRadians(14);
+      double max_distance = 4.2;
+      double max_angle    = Math.toRadians(22);
 
       if (distance < min_distance)
       {
@@ -474,5 +478,9 @@ public class Shooter
       //angle_target   = travel_angle; 
       angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))) - Math.toRadians(2.0);
       topShooter_target = 0.65;
+      if (angle_target > 360.0)
+      {
+         angle_target = angle_target - 360.0;
+      }
    }
 }

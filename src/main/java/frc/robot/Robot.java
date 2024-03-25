@@ -19,10 +19,10 @@ public class Robot extends TimedRobot
    private OpModeInterface auton;
    private OpModeInterface test;
    private RobotContainer  robot;
-   private UsbCamera       camera;
 
    private final SendableChooser<OpModeInterface> m_chooser = new SendableChooser<>();
    private final SendableChooser<Alliance> m_alliance = new SendableChooser<>();
+   private UsbCamera camera;
 
    @Override
    public void robotInit() 
@@ -40,6 +40,7 @@ public class Robot extends TimedRobot
 
       camera = CameraServer.startAutomaticCapture();
       camera.setVideoMode( PixelFormat.kMJPEG, 320, 240, 15 );
+      CameraServer.getVideo(camera, PixelFormat.kGray);
    }
 
    @Override

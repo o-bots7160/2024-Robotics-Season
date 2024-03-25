@@ -95,6 +95,7 @@ public class RobotContainer
          SmartDashboard.putNumber("LimelightY", y);
          SmartDashboard.putNumber("LimelightTID", id);
          SmartDashboard.putNumber("LimelightArea", area);
+         SmartDashboard.putNumber("Shooter Distance", target_distance);
 
          LimelightResults llresults = LimelightHelpers.getLatestResults("");
          if ( tempid > 0 && llresults.targetingResults.valid )
@@ -123,6 +124,7 @@ public class RobotContainer
       leds.periodic();
       Pose2d current_pose = driveBase.getPose();
       target_distance = Math.hypot(current_pose.getX() - landmarks.speaker.getX(), current_pose.getY() - landmarks.speaker.getY());
+      target_distance = Math.sqrt(Math.pow(current_pose.getX() - landmarks.speaker.getX(), 2) + Math.pow(current_pose.getY() - landmarks.speaker.getY(), 2));
       shooter.periodic( target_distance );
    }
    public void disable()

@@ -100,7 +100,7 @@ public class Manipulator
             }
             else
             {
-               if ( intake_timer.get() > 1.5 )
+               if ( intake_timer.get() > 1.0 )
                {
                   _shooter.setState( manip_state, distance ); // does this need a delay?
                }
