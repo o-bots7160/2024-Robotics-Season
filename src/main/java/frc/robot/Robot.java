@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,6 +19,7 @@ public class Robot extends TimedRobot
    private OpModeInterface auton;
    private OpModeInterface test;
    private RobotContainer  robot;
+   private UsbCamera       camera;
 
    private final SendableChooser<OpModeInterface> m_chooser = new SendableChooser<>();
    private final SendableChooser<Alliance> m_alliance = new SendableChooser<>();
@@ -35,7 +38,8 @@ public class Robot extends TimedRobot
       m_alliance.addOption("Red", Alliance.Red);
       SmartDashboard.putData("Alliance", m_alliance);
 
-      CameraServer.startAutomaticCapture();
+      camera = CameraServer.startAutomaticCapture();
+      camera.setVideoMode( PixelFormat.kMJPEG, 320, 240, 15 );
    }
 
    @Override
