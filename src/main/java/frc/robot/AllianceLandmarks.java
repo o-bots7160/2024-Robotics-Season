@@ -9,15 +9,15 @@ public class AllianceLandmarks
 {
     private double        blueJoystickInversion = -1.0;
     private Translation2d blueSpeaker   = new Translation2d( 0.55,  5.55 );
-    private Pose2d blueNearLeft         = new Pose2d( 2.5, 7.6,  new Rotation2d(0.0) );
-    private Pose2d blueNearCenter       = new Pose2d( 2.5, 5.5,  new Rotation2d(0.0) );
+    private Pose2d blueNearLeft         = new Pose2d( 3.0, 7.05,  new Rotation2d(0.0) );
+    private Pose2d blueNearCenter       = new Pose2d( 3.0, 5.0,  new Rotation2d(0.0) );
     private Pose2d blueNearRight        = new Pose2d( 2.5, 4.25, new Rotation2d(0.0) );
 
-    private Pose2d blueFarLeft          = new Pose2d( 7.84924, 7.6028, new Rotation2d(0.0) );
-    private Pose2d blueFarLeftCenter    = new Pose2d( 7.84924, 5.9264, new Rotation2d(0.0) );
-    private Pose2d blueFarCenter        = new Pose2d( 7.84924, 4.25,   new Rotation2d(0.0) );
-    private Pose2d blueFarRightCenter   = new Pose2d( 7.84924, 2.5736, new Rotation2d(0.0) );
-    private Pose2d blueFarRight         = new Pose2d( 7.84924, 0.8972, new Rotation2d(0.0) );
+    private Pose2d blueFarLeft          = new Pose2d( 8.34924, 7.0528, new Rotation2d(0.0) );
+    private Pose2d blueFarLeftCenter    = new Pose2d( 8.34924, 5.9264, new Rotation2d(0.0) );
+    private Pose2d blueFarCenter        = new Pose2d( 8.34924, 4.25,   new Rotation2d(0.0) );
+    private Pose2d blueFarRightCenter   = new Pose2d( 8.34924, 2.5736, new Rotation2d(0.0) );
+    private Pose2d blueFarRight         = new Pose2d( 8.34924, 0.8972, new Rotation2d(0.0) );
 
     private Pose2d blueSourceShoot      = new Pose2d( 2.5, 3.5, new Rotation2d(0.0) );
     private Pose2d blueBackPose         = new Pose2d( 3.5, 6.0, new Rotation2d(0.0) );

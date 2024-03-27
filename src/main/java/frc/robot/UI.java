@@ -14,6 +14,7 @@ public class UI
     private boolean speaker_target = false;
     private boolean amp_target     = false;
     private boolean amp_shoot      = false;
+    private boolean robot_oriented = false;
     private boolean stow_active    = true;
 
     public boolean intakeActive()
@@ -152,5 +153,14 @@ public class UI
     public boolean limelightActive()
     {
         return Buttons1.getRawButton(4);
+    }
+
+    public boolean robotOriented()
+    {
+        if (Joystick.getRawButtonPressed(8))
+        {
+            robot_oriented = !robot_oriented;
+        }
+        return robot_oriented;
     }
 }

@@ -17,6 +17,8 @@ public class Manipulator
    private DoubleSolenoid _elbow0     = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 2, 3 );
    private DoubleSolenoid _elbow1     = new DoubleSolenoid( 9, PneumaticsModuleType.REVPH, 4, 5 );
    private Timer intake_timer = new Timer();
+   private Timer amp_timer    = new Timer();
+   private boolean wasIntaking = false;
 
    public static enum MANIP_STATE
    {
@@ -55,11 +57,19 @@ public class Manipulator
                disable();
                break;
             case STOW:
-            case INTAKE:
-            case AMPLIFIER_TARGET:
-            case AMPLIFIER_SHOOT:
                intake_timer.reset();
                intake_timer.start();
+               amp_timer.reset();
+               amp_timer.start();
+               break;
+            case INTAKE:
+               intake_timer.reset();
+               intake_timer.start();
+               break;
+            case AMPLIFIER_TARGET:
+            case AMPLIFIER_SHOOT:
+               amp_timer.reset();
+               amp_timer.start();
                break;
             case CLIMBING:
                break;
@@ -79,27 +89,29 @@ public class Manipulator
             _shooter.setState( manip_state, distance );
             //if ( _shooter.atPosition( ) )
             //{
-            if ( intake_timer.get() > 1.0 )
+            if ( intake_timer.get() > 1.0 ) //&& wasIntaking || amp_timer.get() > 0.1 && !wasIntaking)
             {
                retract();
+               intake_timer.stop();
+               wasIntaking = false;
             }
             //}
-            if ( intake_timer.get() > 1.75 )
+            if ( amp_timer.get() > 0.85 )
             {
                elbowDown();
+               amp_timer.stop();
+               wasIntaking = false;
             }
             break;
          case INTAKE:
             if ( _shooter.haveNote( ) )
             {
-               _shooter.setState( MANIP_STATE.STOW, distance ); // does this need a delay?
-               if ( intake_timer.get() > 1.5 )
-               {
-                  retract();
-               }
+               setState( MANIP_STATE.STOW, distance ); // does this need a delay?
+               wasIntaking = true;
             }
             else
             {
+               wasIntaking = false;
                if ( intake_timer.get() > 1.0 )
                {
                   _shooter.setState( manip_state, distance ); // does this need a delay?
@@ -110,7 +122,7 @@ public class Manipulator
             break;
          case AMPLIFIER_TARGET:
             elbowUp();
-            if ( intake_timer.get() > 2.5 )
+            if ( amp_timer.get() > 2.5 )
             {
                extend();         // does this need to be true to reach the amp?
                _shooter.setState( manip_state, distance ); // does this need a delay?
@@ -131,6 +143,7 @@ public class Manipulator
             }
             else
             {
+               wasIntaking = false;
                setState( MANIP_STATE.STOW, distance ); // does this need a delay?
                //retract();         // does this need to be true to reach the amp?
                //elbowDown();

@@ -42,37 +42,45 @@ public class Auton3FarAmp implements OpModeInterface
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
-                    autonTimer.start();
+                    autonTimer.restart();
                     step++;
                 }
                 break;
             case 1:
-                if (robot.shooter._shooter.ready())
+                if (robot.shooter._shooter.ready() && autonTimer.get() > 1.0)
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
                     if (!robot.shooter._shooter.haveNote())
                     {
                         robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
+                        autonTimer.restart();
                         step++;
                     }
                 }
                 break;
             case 2:
+                if (autonTimer.get() > 0.75)
+                {
+                    step++;
+                }
+                break;
+            case 3:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
-            case 3:
+            case 4:
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
-                    autonTimer.start();
+                    robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
+                    autonTimer.restart();
                     step++;
                 }
                 break;
-            case 4:
-                if (robot.shooter._shooter.ready())
+            case 5:
+                if (robot.shooter._shooter.ready() && autonTimer.get() > 1.0)
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
                     if (!robot.shooter._shooter.haveNote())
@@ -83,7 +91,7 @@ public class Auton3FarAmp implements OpModeInterface
                     }
                 }
                 break;
-            case 5:
+            case 6:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     robot.driveBase.stopDrive();
@@ -91,21 +99,22 @@ public class Auton3FarAmp implements OpModeInterface
                     step++;
                 }
                 break;
-            case 6:
+            case 7:
                 if (!robot.driveBase.move_Pose2d(nextPose))
                 {
                     robot.driveBase.stopDrive();
                     step++;
                 }
                 break;
-            case 7:
+            case 8:
                 if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
                 {
+                    autonTimer.restart();
                     step++;
                 }
                 break;
-            case 8:
-                if (robot.shooter._shooter.ready())
+            case 9:
+                if (robot.shooter._shooter.ready() && autonTimer.get() > 1.0)
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
                     step++;

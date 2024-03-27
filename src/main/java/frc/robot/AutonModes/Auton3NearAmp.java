@@ -39,6 +39,7 @@ public class Auton3NearAmp implements OpModeInterface
     public void Periodic()
     {
         System.out.println(step);
+        System.out.println("");
         switch (step)
         {
             case 0:
@@ -91,7 +92,7 @@ public class Auton3NearAmp implements OpModeInterface
                         robot.shooter.setState(MANIP_STATE.INTAKE, 0.0);
                         autonTimer.restart();
                         nextPose = robot.landmarks.nearCenter;
-                        //step++;
+                        step++;
                     }
                 }
                 break;

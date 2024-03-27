@@ -64,15 +64,36 @@ public class Teleop implements OpModeInterface
       }
       else if ( Joystick.getRawAxis(2) > 0.1 )
       {
-         robot.driveBase.drive( x/turboPower, y/turboPower, hx*8 );
+         if ( UI.robotOriented())
+         {
+            robot.driveBase.driveRobot( x/turboPower, y/turboPower, hx*8 );
+         }
+         else
+         {
+            robot.driveBase.drive( x/turboPower, y/turboPower, hx*8 );
+         }
       }
       else if ( Joystick.getRawButton(5))
       {
-         robot.driveBase.drive( x/slowPower, y/slowPower, hx/slowPower);
+         if ( UI.robotOriented())
+         {
+            robot.driveBase.driveRobot( x/slowPower, y/slowPower, hx/slowPower );
+         }
+         else
+         {
+            robot.driveBase.drive( x/slowPower, y/slowPower, hx/slowPower);
+         }
       }
       else
       {
-         robot.driveBase.drive( x, y, hx );//x, hy );
+         if ( UI.robotOriented())
+         {
+            robot.driveBase.driveRobot( x, y, hx );
+         }
+         else
+         {
+            robot.driveBase.drive( x, y, hx);
+         }
       }
 
       if( Joystick.getRawButton(7))
@@ -135,7 +156,14 @@ public class Teleop implements OpModeInterface
       }
       if ( UI.ampShoot() )
       {
-         robot.shooter.setState( MANIP_STATE.AMPLIFIER_SHOOT, 0.0 );
+         if( robot.shooter._shooter.haveNote() )
+         {
+            robot.shooter.setState( MANIP_STATE.AMPLIFIER_SHOOT, 0.0 );
+         }
+         else
+         {
+            robot.shooter.setState( MANIP_STATE.STOW, 0.0 );
+         }
       }
       else if ( UI.ampTarget() ) // Amp
       {

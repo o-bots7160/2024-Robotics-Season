@@ -80,6 +80,11 @@ public class DriveBase
    {
       swerveDrive.driveFieldOriented( new ChassisSpeeds( x, y, rot ) );
    }
+
+   public void driveRobot( double x, double y, double rot )
+   {
+      swerveDrive.drive( new ChassisSpeeds(x, y, rot) );
+   }
    //
    //   Drive using raw joystick readings with second joystick 
    //

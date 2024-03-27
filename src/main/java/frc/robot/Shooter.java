@@ -30,12 +30,12 @@ public class Shooter
    private TimeOfFlight sensor = new TimeOfFlight( 0 );
 
    private CANSparkMax _angle;
-   private PIDController pid_angle = new PIDController(6.65000, 0.0, 0.0);
+   private PIDController pid_angle = new PIDController(11.000, 0.01, 0.1);
    private DutyCycleEncoder en_angle;
    private double angle_target = 0.0; // position
-   final double travel_angle = Math.toRadians(344.0); // Highest           287.0
-   final double intake_angle = Math.toRadians(45.0); // Lowest            337.0
-   final double amp_angle    = Math.toRadians(25.0); // Intake - 20       317.0
+   final double travel_angle = Math.toRadians(167.0); // Highest           287.0
+   final double intake_angle = Math.toRadians(224.0); // Lowest            337.0
+   final double amp_angle    = Math.toRadians(208.0); // Intake - 20       317.0
    private RelativeEncoder angleEncoder;
 
    private TalonFX _intake;
@@ -76,6 +76,7 @@ public class Shooter
 
       pid_angle.enableContinuousInput(0.0, 2.0 * Math.PI);
       pid_angle.setTolerance(Math.toRadians(1.0));
+      pid_angle.setIZone( Math.toRadians(2.0) );
       //pid_angle.setIZone      ( 0.0 );
       //pid_angle.setFF         ( 0.0 );
       //pid_angle.setOutputRange( -0.9, 0.9 );
@@ -462,9 +463,9 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      double min_distance = 1.2446;
-      double max_distance = 4.2;
-      double max_angle    = Math.toRadians(22);
+      double min_distance = 0.83;
+      double max_distance = 4.67;
+      double max_angle    = Math.toRadians(27); //22
 
       if (distance < min_distance)
       {
@@ -476,7 +477,7 @@ public class Shooter
       }
 
       //angle_target   = travel_angle; 
-      angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))) - Math.toRadians(2.0);
+      angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))) - Math.toRadians(9.0);
       topShooter_target = 0.65;
       if (angle_target > 360.0)
       {

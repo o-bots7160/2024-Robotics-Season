@@ -39,8 +39,7 @@ public class Robot extends TimedRobot
       SmartDashboard.putData("Alliance", m_alliance);
 
       camera = CameraServer.startAutomaticCapture();
-      camera.setVideoMode( PixelFormat.kMJPEG, 320, 240, 15 );
-      CameraServer.getVideo(camera, PixelFormat.kGray);
+      camera.setVideoMode( PixelFormat.kMJPEG, 240, 180, 8 );
    }
 
    @Override
