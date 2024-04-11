@@ -33,6 +33,7 @@ public class Auton3NearAmp implements OpModeInterface
         //initPose = new Pose2d(); // doesn't this overwrite line 31?
         nextPose = robot.landmarks.nearLeft;
         robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
+        autonTimer.restart();
     }
 
     @Override
@@ -43,14 +44,14 @@ public class Auton3NearAmp implements OpModeInterface
         switch (step)
         {
             case 0:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker) || autonTimer.get() > 1.0)
                 {
                     autonTimer.restart();
                     step++;
                 }
                 break;
             case 1:
-                if (robot.shooter._shooter.ready() && autonTimer.get() > 1.0)
+                if (robot.shooter._shooter.ready() || autonTimer.get() > 1.0)
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
                     if (!robot.shooter._shooter.haveNote())
@@ -68,14 +69,15 @@ public class Auton3NearAmp implements OpModeInterface
                 }
                 break;
             case 3:
-                if (!robot.driveBase.move_Pose2d(nextPose))
+                if (!robot.driveBase.move_Pose2d(nextPose) || autonTimer.get() > 2.0)
                 {
                     robot.driveBase.stopDrive();
+                    autonTimer.restart();
                     step++;
                 }
                 break;
             case 4:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker) || autonTimer.get() > 2.0)
                 {
                     robot.shooter.setState(MANIP_STATE.STOW, 0.0);
                     robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, robot.target_distance);
@@ -84,7 +86,7 @@ public class Auton3NearAmp implements OpModeInterface
                 }
                 break;
             case 5:
-                if (robot.shooter._shooter.ready() && autonTimer.get() > 1.0)
+                if (robot.shooter._shooter.ready() || autonTimer.get() > 1.0)
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, robot.target_distance);
                     if (!robot.shooter._shooter.haveNote())

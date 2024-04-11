@@ -23,12 +23,12 @@ public class AllianceLandmarks
     private Pose2d blueBackPose         = new Pose2d( 3.5, 6.0, new Rotation2d(0.0) );
 
     private double        redJoystickInversion = 1.0;
-    private Translation2d redSpeaker    = new Translation2d( 16.529342, 5.55 );
-    private Pose2d redNearLeft          = new Pose2d( 14.579342, 7.6, new Rotation2d( Math.toRadians( 180.0 ) ) );
-    private Pose2d redNearCenter        = new Pose2d( 14.579342, 5.5,  new Rotation2d( Math.toRadians( 180.0 ) ) );
+    private Translation2d redSpeaker    = new Translation2d( 16.929342, 5.55 );
+    private Pose2d redNearLeft          = new Pose2d( 14.579342, 7.05, new Rotation2d( Math.toRadians( 180.0 ) ) );
+    private Pose2d redNearCenter        = new Pose2d( 14.579342, 5.0,  new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redNearRight         = new Pose2d( 14.579342, 4.25,  new Rotation2d( Math.toRadians( 180.0 ) ) );
 
-    private Pose2d redFarLeft           = new Pose2d( 7.84924, 7.6028, new Rotation2d( Math.toRadians( 180.0 ) ) );
+    private Pose2d redFarLeft           = new Pose2d( 7.84924, 7.0528, new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redFarLeftCenter     = new Pose2d( 7.84924, 5.9264, new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redFarCenter         = new Pose2d( 7.84924, 4.25,   new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redFarRightCenter    = new Pose2d( 7.84924, 2.5736, new Rotation2d( Math.toRadians( 180.0 ) ) );
@@ -37,6 +37,7 @@ public class AllianceLandmarks
     private Pose2d redSourceShoot      = new Pose2d( 14.579342, 3.5, new Rotation2d(0.0) );
     private Pose2d redBackPose         = new Pose2d( 13.579342, 6.0, new Rotation2d(0.0) );
 
+    public Alliance      current_alliance;
     public double        joystickInversion;
     public Translation2d speaker        = blueSpeaker;
     public Pose2d        nearLeft       = blueNearLeft;   
@@ -52,6 +53,7 @@ public class AllianceLandmarks
 
     public void newAlliance( Alliance alliance )
     {
+        current_alliance = alliance;
         if ( alliance == Alliance.Blue )
         {
             joystickInversion = blueJoystickInversion;

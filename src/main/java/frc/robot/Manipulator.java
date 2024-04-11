@@ -108,6 +108,10 @@ public class Manipulator
             {
                setState( MANIP_STATE.STOW, distance ); // does this need a delay?
                wasIntaking = true;
+               if ( intake_timer.get() > 1.5 )
+               {
+                  retract();
+               }
             }
             else
             {

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Manipulator.MANIP_STATE;
 
 public class Teleop implements OpModeInterface
@@ -88,7 +89,14 @@ public class Teleop implements OpModeInterface
       {
          if ( UI.robotOriented())
          {
-            robot.driveBase.driveRobot( x, y, hx );
+            if ( robot.landmarks.current_alliance == Alliance.Red )
+            {
+               robot.driveBase.driveRobot( -x, -y, hx );
+            }
+            else
+            {
+               robot.driveBase.driveRobot( x, y, hx );
+            }
          }
          else
          {

@@ -31,6 +31,7 @@ public class Auton1NearCenter implements OpModeInterface
         robot.setManual( false );
         //initPose = new Pose2d();
         nextPose = robot.landmarks.backPose;
+        autonTimer.restart();
     }
 
     @Override
@@ -40,15 +41,15 @@ public class Auton1NearCenter implements OpModeInterface
         switch (step)
         {
             case 0:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker) || autonTimer.get() > 1.0 )
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, 0.0);
-                    // autonTimer.start();
+                    autonTimer.restart();
                     step++;
                 }
                 break;
             case 1:
-                if (robot.shooter._shooter.ready()) //autonTimer.get > 2.0
+                if (robot.shooter._shooter.ready() || autonTimer.get() > 2.0)
                 {
                     // autonTimer.stop();
                     // autonTimer.reset();

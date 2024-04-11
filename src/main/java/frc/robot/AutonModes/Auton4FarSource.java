@@ -30,6 +30,7 @@ public class Auton4FarSource implements OpModeInterface
         robot.setManual( false );
         //initPose = new Pose2d();
         nextPose = robot.landmarks.farRight;
+        autonTimer.restart();
     }
 
     @Override
@@ -39,27 +40,25 @@ public class Auton4FarSource implements OpModeInterface
         switch (step)
         {
             case 0:
-                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker))
+                if (!robot.driveBase.driveFacing(0.0, 0.0, robot.landmarks.speaker) || autonTimer.get() > 1.0 )
                 {
                     robot.shooter.setState(MANIP_STATE.SPEAKER_TARGET, 0.0);
-                    autonTimer.start();
+                    autonTimer.restart();
                     step++;
                 }
                 break;
             case 1:
                 if (autonTimer.get() > 0.3)
                 {
-                    autonTimer.stop();
-                    autonTimer.reset();
                     robot.shooter.setState(MANIP_STATE.SPEAKER_SHOOT, 0.0);
-                    autonTimer.start();
+                    autonTimer.restart();
                     step++;
                 }
                 break;
             case 2:
-                if (!robot.driveBase.move_Pose2d(nextPose))
+                if (!robot.driveBase.move_Pose2d(nextPose) || autonTimer.get() > 5.0 )
                 {
-                    autonTimer.start();
+                    autonTimer.restart();
                     robot.driveBase.stopDrive();
                     step++;
                 }
