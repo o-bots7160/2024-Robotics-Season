@@ -28,13 +28,13 @@ public class Teleop implements OpModeInterface
    }
    public void Periodic()
    {
-      x  = Joystick.getRawAxis(5);
+      x  = Joystick.getRawAxis(1);
       x  = robot.landmarks.joystickInversion * Math.pow( x, 3.0 ) * robot.driveBase.getMaximumVelocity()/2.0;
-      y  = Joystick.getRawAxis(4);
+      y  = Joystick.getRawAxis(0);
       y  = robot.landmarks.joystickInversion * Math.pow( y, 3.0 ) * robot.driveBase.getMaximumVelocity()/2.0;
-      hx = -Joystick.getRawAxis(0);
+      hx = -Joystick.getRawAxis(4);
       hx = Math.pow( hx, 3.0 ) * robot.driveBase.getMaximumVelocity();
-      hy = -Joystick.getRawAxis(1);
+      hy = -Joystick.getRawAxis(5);
       hy = Math.pow( hy, 3.0 ) * robot.driveBase.getMaximumVelocity();
       double turboPower = 1.0-Joystick.getRawAxis(2)+0.1;
       double slowPower  = 3.0;

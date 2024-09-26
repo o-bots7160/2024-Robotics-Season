@@ -7,7 +7,7 @@ public class UI
 
     Joystick Joystick = new Joystick(0); // Joystick
     Joystick Buttons1 = new Joystick(1); // Button Board
-    Joystick Buttons2 = new Joystick(2); // Button Board
+    //Joystick Buttons2 = new Joystick(2); // Button Board
 
     private boolean intake_active  = false;
     private boolean speaker_shoot  = false;
@@ -15,11 +15,12 @@ public class UI
     private boolean amp_target     = false;
     private boolean amp_shoot      = false;
     private boolean robot_oriented = false;
+    private boolean limelight      = true;
     private boolean stow_active    = true;
 
     public boolean intakeActive()
     {
-        if (Joystick.getRawAxis(3) > 0.25) // Intake
+        if (Joystick.getRawAxis(3) > 0.5) // Intake
         {
             intake_active = true;
             speaker_shoot = false;
@@ -28,7 +29,7 @@ public class UI
             amp_target = false;
             stow_active = false;
         }
-        else if (Joystick.getRawAxis(3) <= 0.25)
+        else if (Joystick.getRawAxis(3) <= 0.5)
         {
             intake_active = false;
         }
@@ -50,7 +51,7 @@ public class UI
     
     public boolean speakerTarget()
     {
-        if (Buttons1.getRawButtonPressed(3))
+        if (Joystick.getRawButtonPressed(1))
         {
             speaker_target = !speaker_target;
         }
@@ -72,7 +73,7 @@ public class UI
 
     public boolean ampTarget()
     {
-        if (Buttons2.getRawButtonPressed(4))
+        if (Buttons1.getRawButtonPressed(6))
         {
             amp_target = !amp_target;
         }
@@ -81,7 +82,7 @@ public class UI
 
     public boolean stowActive()
     {
-        if (Buttons1.getRawButtonPressed(2))
+        if (Buttons1.getRawButtonPressed(5))
         {
             stow_active = true;
             intake_active = false;
@@ -90,7 +91,7 @@ public class UI
             amp_shoot = false;
             amp_target = false;
         }
-        else if (Buttons1.getRawButtonReleased(2))
+        else if (Buttons1.getRawButtonReleased(5))
         {
             stow_active = false;
         }
@@ -99,13 +100,13 @@ public class UI
 
     public boolean lockActive()
     {
-        return Buttons1.getRawButton(1);
+        return Joystick.getRawButton(3);
     }
 
     public boolean leftClimbExtend()
     {
         stow_active = false;
-        if (Buttons1.getRawButton(11))
+        if (Buttons1.getRawButton(3))
         {
             intake_active = false;
             speaker_shoot = false;
@@ -113,18 +114,18 @@ public class UI
             amp_shoot = false;
             amp_target = false;
         }
-        return Buttons1.getRawButton(11);
+        return Buttons1.getRawButton(3);
     }
 
     public boolean leftClimbRetract()
     {
-        return Buttons1.getRawButton(7);
+        return Buttons1.getRawButton(2);
     }
 
     public boolean rightClimbExtend()
     {
         stow_active = false;
-        if (Buttons2.getRawButton(6))
+        if (Buttons1.getRawButton(4))
         {
             intake_active = false;
             speaker_shoot = false;
@@ -132,27 +133,31 @@ public class UI
             amp_shoot = false;
             amp_target = false;
         }
-        return Buttons2.getRawButton(6);
+        return Buttons1.getRawButton(4);
     }
 
     public boolean rightClimbRetract()
     {
-        return Buttons2.getRawButton(5);
+        return Buttons1.getRawButton(1);
     }
 
     public boolean manualRotUp()
     {
-        return Buttons1.getRawButton(5);
+        return Buttons1.getRawButton(7);
     }
 
     public boolean manualRotDown()
     {
-        return Buttons1.getRawButton(6);
+        return Buttons1.getRawButton(8);
     }
 
     public boolean limelightActive()
     {
-        return Buttons1.getRawButton(4);
+        if (Buttons1.getRawButtonPressed(9))
+        {
+            limelight = !limelight;
+        }
+        return limelight;
     }
 
     public boolean robotOriented()

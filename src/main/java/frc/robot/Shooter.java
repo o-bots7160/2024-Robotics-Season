@@ -463,9 +463,9 @@ public class Shooter
 
    private void calculateAngleAndSpeedFrom( double distance )
    {
-      double min_distance = 0.83;
+      double min_distance = 1.3;
       double max_distance = 4.67;
-      double max_angle    = Math.toRadians(27); //22
+      double max_angle    = Math.toRadians(24); //22
 
       if (distance < min_distance)
       {
@@ -478,7 +478,7 @@ public class Shooter
 
       //angle_target   = travel_angle; 
       angle_target   = travel_angle + ((max_angle)*((max_distance-distance)/(max_distance-min_distance))) - Math.toRadians(9.0);
-      topShooter_target = 0.65;
+      topShooter_target = 0.6;
       if (angle_target > 360.0)
       {
          angle_target = angle_target - 360.0;

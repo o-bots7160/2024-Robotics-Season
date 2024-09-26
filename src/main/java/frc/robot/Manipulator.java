@@ -182,6 +182,7 @@ public class Manipulator
                break;
       }
       _shooter.periodic( distance );
+      System.out.println(manip_state);
    }
    public void extend()
    {

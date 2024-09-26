@@ -9,8 +9,9 @@ public class AllianceLandmarks
 {
     private double        blueJoystickInversion = -1.0;
     private Translation2d blueSpeaker   = new Translation2d( 0.55,  5.55 );
-    private Pose2d blueNearLeft         = new Pose2d( 3.0, 7.05,  new Rotation2d(0.0) );
-    private Pose2d blueNearCenter       = new Pose2d( 3.0, 5.0,  new Rotation2d(0.0) );
+    private Pose2d blueStart            = new Pose2d( 1.60, 6.95, new Rotation2d(Math.toRadians(48.0)));
+    private Pose2d blueNearLeft         = new Pose2d( 3.25, 7.05,  new Rotation2d(0.0) );
+    private Pose2d blueNearCenter       = new Pose2d( 2.75, 5.5,  new Rotation2d(0.0) );
     private Pose2d blueNearRight        = new Pose2d( 2.5, 4.25, new Rotation2d(0.0) );
 
     private Pose2d blueFarLeft          = new Pose2d( 8.34924, 7.0528, new Rotation2d(0.0) );
@@ -24,8 +25,9 @@ public class AllianceLandmarks
 
     private double        redJoystickInversion = 1.0;
     private Translation2d redSpeaker    = new Translation2d( 16.929342, 5.55 );
+    private Pose2d redStart             = new Pose2d( 15.829342, 7.0, new Rotation2d(Math.toRadians( 225.0 )));
     private Pose2d redNearLeft          = new Pose2d( 14.579342, 7.05, new Rotation2d( Math.toRadians( 180.0 ) ) );
-    private Pose2d redNearCenter        = new Pose2d( 14.579342, 5.0,  new Rotation2d( Math.toRadians( 180.0 ) ) );
+    private Pose2d redNearCenter        = new Pose2d( 14.329342, 5.0,  new Rotation2d( Math.toRadians( 180.0 ) ) );
     private Pose2d redNearRight         = new Pose2d( 14.579342, 4.25,  new Rotation2d( Math.toRadians( 180.0 ) ) );
 
     private Pose2d redFarLeft           = new Pose2d( 7.84924, 7.0528, new Rotation2d( Math.toRadians( 180.0 ) ) );
@@ -40,6 +42,7 @@ public class AllianceLandmarks
     public Alliance      current_alliance;
     public double        joystickInversion;
     public Translation2d speaker        = blueSpeaker;
+    public Pose2d start                 = blueStart;
     public Pose2d        nearLeft       = blueNearLeft;   
     public Pose2d        nearRight      = blueNearRight;
     public Pose2d        nearCenter     = blueNearCenter;
@@ -58,6 +61,7 @@ public class AllianceLandmarks
         {
             joystickInversion = blueJoystickInversion;
             speaker           = blueSpeaker;
+            start             = blueStart;
             nearLeft          = blueNearLeft;
             nearRight         = blueNearRight;
             nearCenter        = blueNearCenter;
@@ -73,6 +77,7 @@ public class AllianceLandmarks
         {
             joystickInversion = redJoystickInversion;
             speaker           = redSpeaker;
+            start             = redStart;
             nearLeft          = redNearLeft;
             nearRight         = redNearRight;
             nearCenter        = redNearCenter;

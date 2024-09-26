@@ -24,21 +24,21 @@ public class Climber {
     {
         _leftClimber = new CANSparkMax(50, MotorType.kBrushless);
         _leftClimber.setSmartCurrentLimit(40);
-        _leftClimber.setInverted(false);
-        _leftClimber.enableSoftLimit(SoftLimitDirection.kReverse, false);
+        _leftClimber.setInverted(true);
+        _leftClimber.enableSoftLimit(SoftLimitDirection.kReverse, true);
         _leftClimber.setSoftLimit(SoftLimitDirection.kReverse, 0);        //lower limit //FIXME
-        _leftClimber.enableSoftLimit(SoftLimitDirection.kForward, false);
-        _leftClimber.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
+        _leftClimber.enableSoftLimit(SoftLimitDirection.kForward, true);
+        _leftClimber.setSoftLimit(SoftLimitDirection.kForward, 545);      //upper limit //FIXME
         _leftClimber.setIdleMode(IdleMode.kBrake);
         l_enc = _leftClimber.getEncoder( );
 
         _rightClimber = new CANSparkMax(51, MotorType.kBrushless);
         _rightClimber.setSmartCurrentLimit(40);
-        _rightClimber.setInverted(false);
-        _rightClimber.enableSoftLimit(SoftLimitDirection.kReverse, false);
+        _rightClimber.setInverted(true);
+        _rightClimber.enableSoftLimit(SoftLimitDirection.kReverse, true);
         _rightClimber.setSoftLimit(SoftLimitDirection.kReverse, 0);        //lower limit //FIXME
-        _rightClimber.enableSoftLimit(SoftLimitDirection.kForward, false);
-        _rightClimber.setSoftLimit(SoftLimitDirection.kForward, 100);      //upper limit //FIXME
+        _rightClimber.enableSoftLimit(SoftLimitDirection.kForward, true);
+        _rightClimber.setSoftLimit(SoftLimitDirection.kForward, 555);      //upper limit //FIXME
         _rightClimber.setIdleMode(IdleMode.kBrake);
         r_enc = _rightClimber.getEncoder( );
         
@@ -54,6 +54,11 @@ public class Climber {
    {
       SmartDashboard.putNumber("climber/left", l_enc.getPosition());
       SmartDashboard.putNumber("climber/right", r_enc.getPosition());
+   }
+
+   public void init()
+   {
+      
    }
 
     public void leftExtend( )

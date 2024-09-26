@@ -122,6 +122,7 @@ public class RobotContainer
 
       driveBase.periodic();
       leds.periodic();
+      climber.periodic();
       Pose2d current_pose = driveBase.getPose();
       target_distance = Math.hypot(current_pose.getX() - landmarks.speaker.getX(), current_pose.getY() - landmarks.speaker.getY());
       target_distance = Math.sqrt(Math.pow(current_pose.getX() - landmarks.speaker.getX(), 2) + Math.pow(current_pose.getY() - landmarks.speaker.getY(), 2));
